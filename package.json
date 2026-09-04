@@ -1,0 +1,21 @@
+{
+  "name": "pygmalion-monorepo",
+  "private": true,
+  "type": "module",
+  "packageManager": "pnpm@11.15.1",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "build": "pnpm -r --filter './packages/*' build",
+    "dev": "pnpm --filter playground dev",
+    "test": "vitest run",
+    "test:e2e": "pnpm --filter playground test",
+    "typecheck": "pnpm -r typecheck",
+    "release": "pnpm build && pnpm -r --filter './packages/*' publish --access public"
+  },
+  "devDependencies": {
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

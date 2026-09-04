@@ -1,0 +1,52 @@
+{
+  "name": "@oumarbarry/pygmalion-core",
+  "version": "0.1.0",
+  "description": "Pygmalion domain layer: Drizzle schema and commerce services, no framework imports",
+  "keywords": ["ecommerce", "commerce", "drizzle", "postgres", "pygmalion"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oumarbarry/pygmalion.git",
+    "directory": "packages/core"
+  },
+  "homepage": "https://github.com/oumarbarry/pygmalion#readme",
+  "bugs": "https://github.com/oumarbarry/pygmalion/issues",
+  "author": "Oumar Barry",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    },
+    "./schema": {
+      "types": "./dist/schema/index.d.mts",
+      "import": "./dist/schema/index.mjs"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "drizzle-orm": "catalog:",
+    "drizzle-kit": "catalog:",
+    "nanoid": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "catalog:",
+    "tsdown": "^0.22.13",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

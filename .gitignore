@@ -1,0 +1,11 @@
+node_modules
+dist
+.nuxt
+.output
+.data
+*.log
+.DS_Store
+
+# AI tooling (local only)
+.claude/
+.agents/

@@ -1,0 +1,30 @@
+packages:
+  - 'packages/*'
+  - 'apps/*'
+
+onlyBuiltDependencies:
+  - esbuild
+  - vue-demi
+
+catalog:
+  nuxt: ^4.5.0
+  vue: ^3.5.40
+  drizzle-orm: 1.0.0-rc.4
+  drizzle-kit: 1.0.0-rc.4
+  '@electric-sql/pglite': ^0.5.4
+  pg: ^8.13.0
+  '@types/pg': ^8.11.10
+  nanoid: ^6.0.0
+  better-auth: ^1.6.23
+  '@better-auth/api-key': ^1.6.23
+  zod: ^4.4.3
+  vitest: ^3.2.7
+  typescript: ^6.0.3
+  '@nuxt/test-utils': ^4.0.3
+
+allowBuilds:
+  esbuild: true
+  vue-demi: true
+
+minimumReleaseAgeExclude:
+  - tsdown@0.22.13

@@ -1,0 +1,11 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "dist",
+    "rootDir": "src",
+    // DOM for the fetch types only (Response/RequestInit/Headers): the SDK has
+    // zero runtime dependencies, so it cannot pull @types/node just to name them.
+    "lib": ["ES2023", "DOM"]
+  },
+  "include": ["src"]
+}

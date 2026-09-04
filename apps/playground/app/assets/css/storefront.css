@@ -1,0 +1,150 @@
+/**
+ * Storefront skin, "Maison Pygmalion".
+ *
+ * Nuxt UI runs `unstyled` (the @oumarbarry/pygmalion-admin layer owns app.config.ts), so
+ * the semantic tokens — bg-default, text-muted, border-default, primary… — are
+ * the same *names* as the admin's. What this file does is re-point a handful of
+ * them **inside `.shop`** so the shop has its own voice without a single change
+ * in `packages/admin`: same house, different room (coherence, not
+ * uniformity). `.shop` is set once, on the root element of `layouts/default`.
+ *
+ * The admin's own main.css is imported by the layer and already pulls
+ * tailwindcss + @nuxt/ui; this file only adds what the shop needs on top.
+ */
+
+/* Semantic z-scale — an overlay must never be a guessed 9999. */
+:root {
+  --z-sticky: 30;
+  --z-backdrop: 40;
+  --z-drawer: 50;
+}
+
+/* --- The shop's own tokens -------------------------------------------------
+ * Scoped to `.shop`, so /admin in the same app keeps the admin's tokens.
+ * Everything downstream (Nuxt UI slots, Tailwind utilities) reads these vars
+ * at use-time, so re-pointing them here re-skins every component at once —
+ * no per-page class, no fork of the layer's app.config.
+ */
+.shop {
+  /* Voice: a text serif for anything that speaks, the layer's humanist sans
+   * for anything that works. Pairing is on the serif/sans axis, never two
+   * near-identical sans faces. Provisioned by @nuxt/fonts (already in the
+   * stack via @nuxt/ui) — no new dependency. */
+  --shop-font-display: 'Newsreader', ui-serif, Georgia, 'Times New Roman', serif;
+
+  /* The shop's "yes": prune. Deliberately NOT the admin's emerald — a shopper
+   * and a merchant are not looking at the same product. Set as the resolved
+   * token rather than a 50→950 ramp because nothing in the storefront asks for
+   * a numbered shade (checked: only text/bg/border/ring-primary are used).
+   * L 0.44 against white text = ~9:1, AA at every size. */
+  --ui-primary: oklch(0.44 0.115 350);
+
+  /* Corners. The admin sets 0.75rem — at `rounded-xl` (= radius × 3) that's a
+   * 36px stadium on a 44px control, and 48px on a photo: friendly, and much too
+   * soft for retail. 0.25rem gives lg 8 / xl 12 / 2xl 16 px: crisp, the product
+   * photo keeps its own shape. One token re-corners every Nuxt UI control and
+   * every `rounded-*` utility under `.shop`. */
+  --ui-radius: 0.25rem;
+
+  /* Native controls (radio in the payment step, checkbox) follow the shop's
+   * accent instead of the browser's blue — one line, every native input. */
+  accent-color: var(--ui-primary);
+
+  /* Fine print is still print. The layer maps `dimmed` to neutral-400, which is
+   * ~2.6:1 on white — under AA. The shop has no text below 4.5:1, so `dimmed`
+   * is one step darker here and the pages keep using the semantic class. */
+  --ui-text-dimmed: var(--ui-color-neutral-500);
+}
+
+.dark .shop {
+  /* Light enough that `text-inverted` (neutral-900 in dark) reads on it, and
+   * that `text-primary` separates from `text-highlighted`. */
+  --ui-primary: oklch(0.68 0.10 350);
+  --ui-text-dimmed: var(--ui-color-neutral-400);
+}
+
+/* A field's hint belongs to its label, not to the far edge of the form. The
+ * layer spreads `labelWrapper` with `justify-between`, which reads fine on the
+ * admin's narrow columns and disconnected across a 680px shop field. Same slot,
+ * different room — the shop pulls it back next to the label. */
+.shop [data-slot='labelWrapper'] {
+  justify-content: flex-start;
+}
+
+/* Display voice: the serif, set tight but never cramped (≥ -0.04em floor). */
+.shop-display {
+  font-family: var(--shop-font-display);
+  font-weight: 500;
+  letter-spacing: -0.015em;
+  line-height: 1.08;
+  text-wrap: balance;
+}
+
+/* Prices align in a column when they sit in a list of totals. */
+.shop-num {
+  font-variant-numeric: tabular-nums;
+}
+
+/* A price is not body copy: it is the second thing read after the photo. */
+.shop-price {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+/* Long-form product copy: readable measure, no orphans. */
+.shop-prose {
+  max-width: 68ch;
+  text-wrap: pretty;
+}
+
+/* --- Cart drawer -----------------------------------------------------------
+ * Native <dialog> + showModal(): focus trap, Escape, inert background and the
+ * aria-modal semantics come from the platform. All that's left is placing it
+ * on the right edge and animating the entrance.
+ */
+.shop-drawer {
+  margin: 0 0 0 auto;
+  height: 100dvh;
+  max-height: 100dvh;
+  width: min(28rem, 100vw);
+  max-width: 100vw;
+  /* A panel that shares the page's own background needs an edge, in both
+   * themes — the backdrop alone doesn't separate it. */
+  border: 0;
+  border-left: 1px solid var(--ui-border);
+  box-shadow: -1.5rem 0 3rem -1rem rgb(0 0 0 / 0.18);
+  padding: 0;
+  overflow: visible;
+}
+
+.shop-drawer::backdrop {
+  background: rgb(0 0 0 / 0.45);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .shop-drawer[open] {
+    animation: shop-drawer-in 260ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .shop-drawer[open]::backdrop {
+    animation: shop-fade-in 260ms cubic-bezier(0.16, 1, 0.3, 1);
+  }
+}
+
+@keyframes shop-drawer-in {
+  from {
+    transform: translateX(2rem);
+    opacity: 0;
+  }
+}
+
+@keyframes shop-fade-in {
+  from {
+    opacity: 0;
+  }
+}
+
+/* Image placeholder while a product photo loads — a tone, never a grey box. */
+.shop-media {
+  background-color: var(--ui-bg-elevated, #f4f4f5);
+}

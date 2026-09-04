@@ -1,0 +1,51 @@
+{
+  "name": "@oumarbarry/pygmalion-stripe",
+  "version": "0.1.0",
+  "description": "Stripe payment provider for Pygmalion",
+  "keywords": ["nuxt", "nuxt-module", "ecommerce", "stripe", "payments", "pygmalion"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oumarbarry/pygmalion.git",
+    "directory": "packages/stripe"
+  },
+  "homepage": "https://github.com/oumarbarry/pygmalion#readme",
+  "bugs": "https://github.com/oumarbarry/pygmalion/issues",
+  "author": "Oumar Barry",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "main": "./dist/module.mjs",
+  "types": "./dist/types.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/types.d.mts",
+      "import": "./dist/module.mjs"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "nuxt-module-build build",
+    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@nuxt/kit": "^4.5.0",
+    "@oumarbarry/pygmalion-core": "workspace:*",
+    "stripe": "^22.3.2"
+  },
+  "devDependencies": {
+    "@nuxt/module-builder": "^1.0.2",
+    "@nuxt/schema": "^4.5.0",
+    "@oumarbarry/pygmalion": "workspace:*",
+    "h3": "^1.15.0",
+    "nitropack": "^2.13.0",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

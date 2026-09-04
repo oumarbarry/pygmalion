@@ -1,0 +1,42 @@
+{
+  "name": "@oumarbarry/pygmalion-sdk",
+  "version": "0.1.0",
+  "description": "Typed HTTP client for a Pygmalion server, zero runtime dependencies",
+  "keywords": ["ecommerce", "sdk", "client", "storefront", "pygmalion"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oumarbarry/pygmalion.git",
+    "directory": "packages/sdk"
+  },
+  "homepage": "https://github.com/oumarbarry/pygmalion#readme",
+  "bugs": "https://github.com/oumarbarry/pygmalion/issues",
+  "author": "Oumar Barry",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "main": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsdown",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@oumarbarry/pygmalion-core": "workspace:*",
+    "tsdown": "^0.22.13",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -1,0 +1,64 @@
+{
+  "name": "@oumarbarry/pygmalion",
+  "version": "0.1.0",
+  "description": "Ecommerce framework for Nuxt: API, admin, auth and database from one module",
+  "keywords": ["nuxt", "nuxt-module", "ecommerce", "commerce", "shop", "storefront", "postgres", "pygmalion"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oumarbarry/pygmalion.git",
+    "directory": "packages/nuxt"
+  },
+  "homepage": "https://github.com/oumarbarry/pygmalion#readme",
+  "bugs": "https://github.com/oumarbarry/pygmalion/issues",
+  "author": "Oumar Barry",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "main": "./dist/module.mjs",
+  "types": "./dist/types.d.mts",
+  "exports": {
+    ".": {
+      "types": "./dist/types.d.mts",
+      "import": "./dist/module.mjs"
+    }
+  },
+  "bin": {
+    "pygmalion-migrate": "./bin/pygmalion-migrate.mjs"
+  },
+  "files": ["dist", "bin"],
+  "scripts": {
+    "build": "nuxt-module-build build",
+    "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@nuxt/kit": "^4.5.0",
+    "@oumarbarry/pygmalion-core": "workspace:*",
+    "@oumarbarry/pygmalion-sdk": "workspace:*",
+    "@better-auth/api-key": "catalog:",
+    "@electric-sql/pglite": "catalog:",
+    "better-auth": "catalog:",
+    "drizzle-orm": "catalog:",
+    "drizzle-kit": "catalog:",
+    "jiti": "^2.7.0",
+    "pg": "catalog:",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@nuxt/module-builder": "^1.0.2",
+    "@nuxt/schema": "^4.5.0",
+    "@types/pg": "catalog:",
+    "h3": "^1.15.0",
+    "nitropack": "^2.13.0",
+    "nuxt": "catalog:",
+    "vue": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

@@ -1,0 +1,27 @@
+{
+  "name": "playground",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@nuxt/ui": "^4.10.0",
+    "@oumarbarry/pygmalion-admin": "workspace:*",
+    "@oumarbarry/pygmalion-core": "workspace:*",
+    "@oumarbarry/pygmalion": "workspace:*",
+    "@oumarbarry/pygmalion-sdk": "workspace:*",
+    "@oumarbarry/pygmalion-stripe": "workspace:*",
+    "drizzle-orm": "catalog:",
+    "nuxt": "catalog:",
+    "vue": "catalog:"
+  },
+  "devDependencies": {
+    "@electric-sql/pglite": "catalog:",
+    "@nuxt/test-utils": "catalog:",
+    "vitest": "catalog:"
+  }
+}

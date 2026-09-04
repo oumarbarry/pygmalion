@@ -1,0 +1,67 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+/**
+ * Pygmalion admin design tokens.
+ * Nuxt UI runs in `unstyled` mode (nuxt.config.ts) — these tokens plus
+ * app.config.ts's `ui` overrides ARE the entire visual design. Nothing here
+ * is Nuxt UI's default theme; it is Pygmalion's own, built on top of Reka UI's
+ * accessible, unstyled component behaviour.
+ *
+ * Tone (for a merchant who may read with difficulty): warm, rounded, high-contrast,
+ * generous type scale, generous touch targets. Never data-dense/technical.
+ */
+@theme {
+  --font-sans: 'Nunito Sans', ui-sans-serif, system-ui, sans-serif;
+}
+
+:root {
+  /*
+   * `--ui-radius` is NOT a corner radius: Nuxt UI v4 derives the whole
+   * `rounded-*` scale from it as a MULTIPLIER
+   * (sm = 1x, md = 1.5x, lg = 2x, xl = 3x, 2xl = 4x, 3xl = 6x).
+   * A first version set it to 0.75rem meaning "12px corners"; that actually rendered
+   * every button at 36px and every card at 48px — bubbles, not corners
+   * (seen on the first visual pass with the theme loading). 0.25rem is
+   * what was intended: buttons/inputs `rounded-xl` = 12px, cards
+   * `rounded-2xl` = 16px. Soft and approachable, never sharp/enterprise.
+   */
+  --ui-radius: 0.25rem;
+}
+
+/*
+ * Contrast, measured in the browser, not eyeballed.
+ *
+ * Nuxt UI's `text-dimmed` ships at neutral-400 in light (2.58:1 on white) and
+ * neutral-500 in dark (4.35:1) — both under WCAG AA 4.5:1 for body text. The
+ * admin uses it for things a merchant has to READ: every input placeholder,
+ * every form hint, the column labels of PygList's mobile cards, the "TOTAL" /
+ * "Encaissé" labels on the money card. The admin targets someone who reads with
+ * difficulty; a third grey tier that fails AA is not a hierarchy, it is a
+ * wall. `dimmed` is therefore pulled up to just clear AA — it stays a shade
+ * lighter than `muted`, and hierarchy is carried by size and weight instead.
+ */
+/* `.light`/`.dark` only, never `:root`: this file loads after Nuxt UI, so a
+   `:root` declaration here has equal specificity and would win in BOTH
+   themes — it silently pushed the light greys into dark mode. */
+.light {
+  --ui-text-dimmed: oklch(53.5% 0.012 58.071);
+  --ui-text-muted: oklch(52% 0.013 58.071);
+}
+
+.dark {
+  --ui-text-dimmed: oklch(66% 0.013 58.071);
+}
+
+/* Touch targets of at least 44px everywhere in the admin. */
+.pyg-tap-target {
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+}
+
+/* Large amounts: shared numeral treatment for PygMoney. */
+.pyg-money {
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}

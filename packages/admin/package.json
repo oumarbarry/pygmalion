@@ -1,0 +1,46 @@
+{
+  "name": "@oumarbarry/pygmalion-admin",
+  "version": "0.1.0",
+  "description": "Pygmalion admin: a Nuxt layer mounted on /admin",
+  "keywords": ["nuxt", "nuxt-layer", "ecommerce", "admin", "pygmalion"],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/oumarbarry/pygmalion.git",
+    "directory": "packages/admin"
+  },
+  "homepage": "https://github.com/oumarbarry/pygmalion#readme",
+  "bugs": "https://github.com/oumarbarry/pygmalion/issues",
+  "author": "Oumar Barry",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "type": "module",
+  "main": "./nuxt.config.ts",
+  "files": ["app", "nuxt.config.ts"],
+  "scripts": {
+    "dev": "nuxt dev",
+    "build": "nuxt build",
+    "typecheck": "nuxt typecheck"
+  },
+  "dependencies": {
+    "@better-auth/api-key": "catalog:",
+    "@nuxt/ui": "^4.10.0",
+    "better-auth": "catalog:"
+  },
+  "peerDependencies": {
+    "nuxt": "catalog:",
+    "vue": "catalog:"
+  },
+  "devDependencies": {
+    "@nuxt/kit": "^4.5.0",
+    "@nuxt/schema": "^4.5.0",
+    "nuxt": "catalog:",
+    "typescript": "catalog:",
+    "vue": "catalog:",
+    "vue-tsc": "^3.3.8"
+  }
+}
