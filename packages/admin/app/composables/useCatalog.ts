@@ -174,12 +174,12 @@ export const LOW_STOCK_THRESHOLD = 5
 export function useCatalogNav(): ComputedRef<PygSubNavItem[]> {
   const { t } = useVocabulary()
   return computed(() => [
-    { label: t('navProducts'), to: '/admin/produits', icon: 'i-lucide-shopping-bag', exact: true },
-    { label: t('navCollections'), to: '/admin/produits/collections', icon: 'i-lucide-layers' },
-    { label: t('navCategories'), to: '/admin/produits/categories', icon: 'i-lucide-folder-tree' },
-    { label: t('navTags'), to: '/admin/produits/etiquettes', icon: 'i-lucide-tags' },
-    { label: t('navStock'), to: '/admin/produits/stock', icon: 'i-lucide-boxes' },
-    { label: t('navPricing'), to: '/admin/produits/prix-taxes', icon: 'i-lucide-receipt' },
+    { label: t('navProducts'), to: '/admin/products', icon: 'i-lucide-shopping-bag', exact: true },
+    { label: t('navCollections'), to: '/admin/products/collections', icon: 'i-lucide-layers' },
+    { label: t('navCategories'), to: '/admin/products/categories', icon: 'i-lucide-folder-tree' },
+    { label: t('navTags'), to: '/admin/products/tags', icon: 'i-lucide-tags' },
+    { label: t('navStock'), to: '/admin/products/stock', icon: 'i-lucide-boxes' },
+    { label: t('navPricing'), to: '/admin/products/pricing', icon: 'i-lucide-receipt' },
   ])
 }
 

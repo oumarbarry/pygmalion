@@ -104,7 +104,7 @@ const noPhotoColumns = computed(() => [
           :items="productsWithoutPhoto"
           :columns="noPhotoColumns"
           :loading="catalogLoading"
-          :to="(item) => `/admin/produits/${item.id}`"
+          :to="(item) => `/admin/products/${item.id}`"
         >
           <template #empty>
             <PygEmptyState

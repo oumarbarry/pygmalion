@@ -12,6 +12,8 @@ const props = defineProps<{ modelValue: string[] }>()
 const emit = defineEmits<{ 'update:modelValue': [value: string[]] }>()
 
 const { t } = useVocabulary()
+const { tag } = useAdminFormat()
+const countries = computed(() => countryList(tag.value))
 
 function toggle(iso2: string, next: boolean) {
   const set = new Set(props.modelValue)
@@ -20,10 +22,10 @@ function toggle(iso2: string, next: boolean) {
   emit('update:modelValue', [...set])
 }
 
-const allSelected = computed(() => props.modelValue.length === COUNTRIES.length)
+const allSelected = computed(() => props.modelValue.length === countries.value.length)
 
 function toggleAll(next: boolean) {
-  emit('update:modelValue', next ? COUNTRIES.map((c) => c.iso2) : [])
+  emit('update:modelValue', next ? countries.value.map((c) => c.iso2) : [])
 }
 </script>
 
@@ -36,7 +38,7 @@ function toggleAll(next: boolean) {
       @update:model-value="(next) => toggleAll(next === true)"
     />
     <ul class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-x-6">
-      <li v-for="country in COUNTRIES" :key="country.iso2">
+      <li v-for="country in countries" :key="country.iso2">
         <UCheckbox
           :model-value="modelValue.includes(country.iso2)"
           :label="country.name"

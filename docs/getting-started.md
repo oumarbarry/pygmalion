@@ -4,11 +4,11 @@ This guide starts from an empty machine and stops when an order is paid,
 shipped, and visible on both sides: the storefront and the admin. Count
 20 minutes, 15 of them reading.
 
-**Requirements**: Node 22 or newer, pnpm 11, a browser. No database: in
+**Requirements**: Node 22 or newer, pnpm 12, a browser. No database: in
 development, Pygmalion starts an embedded Postgres (PGlite) under `.data/`.
 
-The admin interface is in French. Screen names below are given in English
-with the French label in parentheses the first time they appear.
+The admin is in English by default and switches to French from the user
+menu (or when the browser prefers French).
 
 ---
 
@@ -69,8 +69,8 @@ In development an owner account is created for you: `owner@pygmalion.dev` /
 On a fresh installation (no staff member in the database), the admin sends
 you to `/admin/first-boot`, where you create the very first owner account. It
 is the **only** staff account created without an invitation. After it,
-sign-up is closed and the team grows by invitation (Settings, Team:
-*Réglages, Équipe*). This is a server-side guard, not a preference:
+sign-up is closed and the team grows by invitation (Settings, Team). This
+is a server-side guard, not a preference:
 `POST /api/admin/auth-bootstrap` answers 403 as soon as a member exists.
 
 ---
@@ -82,10 +82,10 @@ them; on a blank installation, go through the list:
 
 | Setting | Where | Why |
 |---|---|---|
-| A selling area (region and currency) | Settings, Selling areas (*Zones de vente*) | A price exists in a currency; a cart exists in a region |
+| A selling area (region and currency) | Settings, Selling areas | A price exists in a currency; a cart exists in a region |
 | A stock location | `POST /api/admin/stock-locations` | Stock is counted somewhere. There is no dedicated screen yet: without a location, the Stock step of the product wizard stays empty and the product sells without stock management (checkout reserves nothing) |
-| A shipping option | Settings, Shipping (*Livraison*) | Without it, payment is never reached |
-| A tax (optional) | Settings, Taxes (*Taxes*) | VAT or sales tax, per country or province |
+| A shipping option | Settings, Delivery | Without it, payment is never reached |
+| A tax (optional) | Settings, Taxes | VAT or sales tax, per country or province |
 
 The default sales channel, currency and shipping profile are created at
 startup. Nothing to do on that side.
@@ -94,7 +94,7 @@ startup. Nothing to do on that side.
 
 ## 4. Publish your first product
 
-Products (*Produits*), **Add a product**. The wizard has six steps, each
+Products, **Add a product**. The wizard has six steps, each
 saveable, in a merchant's order rather than the schema's:
 
 1. **Details**: name, description, status (draft or on sale).
@@ -135,7 +135,7 @@ one environment variable, no code.
 
 ## 6. Capture and ship
 
-Back in the admin, the order tops the Orders list (*Commandes*) with its next
+Back in the admin, the order tops the Orders list with its next
 step spelled out.
 
 1. **Ship** opens a wizard: which items, which parcel, which tracking number.

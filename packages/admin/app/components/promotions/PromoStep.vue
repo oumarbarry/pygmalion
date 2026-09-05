@@ -156,7 +156,7 @@ function toggle(list: string[], id: string, checked: boolean) {
         :title="t('productsEmptyTitle')"
         :description="t('productsEmptyDescription')"
         :action-label="t('productsEmptyAction')"
-        action-to="/admin/produits/nouveau"
+        action-to="/admin/products/new"
       />
       <PygEmptyState
         v-else-if="draft.target === 'categories' && !categories.length"
@@ -164,7 +164,7 @@ function toggle(list: string[], id: string, checked: boolean) {
         :title="t('categoriesEmptyTitle')"
         :description="t('categoriesEmptyDescription')"
         :action-label="t('newCategory')"
-        action-to="/admin/produits/categories"
+        action-to="/admin/products/categories"
       />
 
       <template v-else>
@@ -243,7 +243,7 @@ function toggle(list: string[], id: string, checked: boolean) {
       :title="t('promoNoGroupsTitle')"
       :description="t('promoNoGroupsDescription')"
       :action-label="t('groupNew')"
-      action-to="/admin/clients/groupes"
+      action-to="/admin/customers/groups"
     />
   </div>
 

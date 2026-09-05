@@ -5,18 +5,19 @@
  * + user menu. Mobile-first: sidebar is an off-canvas
  * drawer under `lg`, every tap target here is >=44px.
  */
-const { t } = useVocabulary()
+const { t, locale, setLocale } = useVocabulary()
+useHead({ htmlAttrs: { lang: locale } })
 const session = useAdminSession()
 const route = useRoute()
 const { $adminFetch } = useNuxtApp()
 
 const navItems = computed(() => [
   { label: t('sectionToday'), to: '/admin', icon: 'i-lucide-sparkles' },
-  { label: t('sectionOrders'), to: '/admin/commandes', icon: 'i-lucide-package' },
-  { label: t('sectionProducts'), to: '/admin/produits', icon: 'i-lucide-shopping-bag' },
-  { label: t('sectionCustomers'), to: '/admin/clients', icon: 'i-lucide-users' },
+  { label: t('sectionOrders'), to: '/admin/orders', icon: 'i-lucide-package' },
+  { label: t('sectionProducts'), to: '/admin/products', icon: 'i-lucide-shopping-bag' },
+  { label: t('sectionCustomers'), to: '/admin/customers', icon: 'i-lucide-users' },
   { label: t('sectionPromotions'), to: '/admin/promotions', icon: 'i-lucide-tag' },
-  { label: t('sectionSettings'), to: '/admin/reglages', icon: 'i-lucide-settings' },
+  { label: t('sectionSettings'), to: '/admin/settings', icon: 'i-lucide-settings' },
 ])
 
 function isActive(to: string) {
@@ -26,9 +27,13 @@ function isActive(to: string) {
 const mobileNavOpen = ref(false)
 watch(() => route.fullPath, () => { mobileNavOpen.value = false })
 
-const userMenuItems = computed(() => [[
-  { label: t('signOut'), icon: 'i-lucide-log-out', onSelect: () => signOutAdmin() },
-]])
+const userMenuItems = computed(() => [
+  [
+    { label: 'English', icon: locale.value === 'en' ? 'i-lucide-check' : 'i-lucide-languages', onSelect: () => setLocale('en') },
+    { label: 'Français', icon: locale.value === 'fr' ? 'i-lucide-check' : 'i-lucide-languages', onSelect: () => setLocale('fr') },
+  ],
+  [{ label: t('signOut'), icon: 'i-lucide-log-out', onSelect: () => signOutAdmin() }],
+])
 
 const initials = computed(() => {
   const name = session.value.data?.user?.name ?? session.value.data?.user?.email ?? ''
@@ -131,7 +136,7 @@ watch(searchQuery, (q) => {
             <ul v-if="searchResults.length">
               <li v-for="r in searchResults" :key="r.id">
                 <NuxtLink
-                  :to="`/admin/produits/${r.id}`"
+                  :to="`/admin/products/${r.id}`"
                   class="flex items-center gap-2 px-3.5 min-h-11 text-sm hover:bg-muted"
                   @click="searchOpen = false"
                 >

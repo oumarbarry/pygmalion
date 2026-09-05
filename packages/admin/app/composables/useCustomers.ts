@@ -148,8 +148,8 @@ export function addressLine(address: AdminCustomerAddress): string {
 export function useCustomersNav(): ComputedRef<PygSubNavItem[]> {
   const { t } = useVocabulary()
   return computed(() => [
-    { label: t('navCustomersList'), to: '/admin/clients', icon: 'i-lucide-users', exact: true },
-    { label: t('navCustomerGroups'), to: '/admin/clients/groupes', icon: 'i-lucide-users-round' },
+    { label: t('navCustomersList'), to: '/admin/customers', icon: 'i-lucide-users', exact: true },
+    { label: t('navCustomerGroups'), to: '/admin/customers/groups', icon: 'i-lucide-users-round' },
   ])
 }
 

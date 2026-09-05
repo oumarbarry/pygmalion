@@ -25,7 +25,8 @@ First public release.
   transaction.
 - `@oumarbarry/pygmalion-admin`: the admin as a Nuxt layer. 49 screens,
   task-based navigation, wizards for composed operations, light and dark
-  themes, mobile layout.
+  themes, mobile layout, English and French (English by default, switch in
+  the user menu).
 - `@oumarbarry/pygmalion-sdk`: a typed client for the store and admin APIs,
   with the `useCart`, `useCheckout`, `useCustomer` and `useRegion`
   composables.

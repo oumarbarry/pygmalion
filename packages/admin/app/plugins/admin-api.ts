@@ -1,4 +1,4 @@
-import { vocabulary, defaultLocale } from '../utils/vocabulary'
+import { vocabulary, detectLocale } from '../utils/vocabulary'
 
 /**
  * Homogeneous error handling for every /api/admin/** call:
@@ -14,7 +14,7 @@ export default defineNuxtPlugin(() => {
       // Read locale via useState directly (not useVocabulary) — plugin setup
       // runs once per app instance, outside a component's reactive template,
       // and this keeps the dependency one-directional (util -> here).
-      const locale = useState('admin-locale', () => defaultLocale)
+      const locale = useState('admin-locale', detectLocale)
       const t = vocabulary[locale.value]
 
       if (response.status === 401) {

@@ -2,7 +2,7 @@
 
 ## Setup
 
-Node 22 or newer and pnpm 11 (`corepack enable` gives you the pinned version).
+Node 22 or newer and pnpm 12 (`corepack enable` gives you the pinned version).
 
 ```bash
 pnpm install
@@ -37,8 +37,9 @@ pnpm test:e2e      # builds apps/playground and runs the HTTP suites (slow)
 - Money is an integer in minor units. Never a float.
 - Guards on money and stock (capture and refund ceilings, reservations) live
   server-side in the service, never only in a screen.
-- Merchant-facing text has no jargon. New admin strings go through the
-  vocabulary (`packages/admin/app/utils/vocabulary.ts`), in both dictionaries.
+- Merchant-facing text has no jargon. Every admin string goes through the
+  vocabulary (`packages/admin/app/utils/vocabulary.ts`), in English and in
+  French; the types refuse a key that misses one of the two.
 - A bug fix or a feature comes with a test: a unit test in the package for
   service logic, an E2E spec in `apps/playground/test` for anything that
   crosses HTTP or auth.

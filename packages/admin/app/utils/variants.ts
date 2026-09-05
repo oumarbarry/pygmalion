@@ -1,5 +1,5 @@
 /**
- * Déclinaison generation for the product wizard. Pure (no Nuxt, no DOM),
+ * Variant generation for the product wizard. Pure (no Nuxt, no DOM),
  * so it is unit-testable next to this file.
  */
 

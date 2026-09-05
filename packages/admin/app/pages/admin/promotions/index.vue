@@ -119,7 +119,7 @@ async function confirmDelete() {
 <template>
   <PygPage :title="t('sectionPromotions')" :description="t('promosSubtitle')">
     <template #actions>
-      <UButton to="/admin/promotions/nouvelle" icon="i-lucide-plus" size="md" :label="t('promoNew')" />
+      <UButton to="/admin/promotions/new" icon="i-lucide-plus" size="md" :label="t('promoNew')" />
     </template>
 
     <PygSubNav :items="navItems" />
@@ -242,7 +242,7 @@ async function confirmDelete() {
             :description="t('promosEmptyDescription')"
             :action-label="t('promoNew')"
             action-icon="i-lucide-plus"
-            action-to="/admin/promotions/nouvelle"
+            action-to="/admin/promotions/new"
           />
         </template>
       </PygList>

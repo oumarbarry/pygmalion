@@ -24,7 +24,7 @@ export function usePromotionsNav(): ComputedRef<PygSubNavItem[]> {
   const { t } = useVocabulary()
   return computed(() => [
     { label: t('navPromotionsList'), to: '/admin/promotions', icon: 'i-lucide-tag', exact: true },
-    { label: t('navCampaigns'), to: '/admin/promotions/campagnes', icon: 'i-lucide-megaphone' },
+    { label: t('navCampaigns'), to: '/admin/promotions/campaigns', icon: 'i-lucide-megaphone' },
   ])
 }
 

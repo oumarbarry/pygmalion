@@ -110,7 +110,7 @@ describe('admin orders (e2e)', async () => {
     await $fetch('/api/store/payment-collections', { method: 'POST', headers: { cookie }, body: { cartId } })
     orderId = (await $fetch<{ order: Id }>(`/api/store/carts/${cartId}/complete`, { method: 'POST', headers: { cookie } })).order.id
 
-    // What `pages/admin/commandes/index.vue` reads: the row list, then one
+    // What `pages/admin/orders/index.vue` reads: the row list, then one
     // detail per row for the two statuses the tabs bucket on.
     const { orders } = await admin<{ orders: Id[] }>('/api/admin/orders', { method: 'GET', query: { limit: 20, offset: 0 } })
     expect(orders.some((o) => o.id === orderId)).toBe(true)

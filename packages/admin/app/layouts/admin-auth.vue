@@ -1,6 +1,8 @@
 <script setup lang="ts">
 // Centered, chrome-free layout for sign-in / first-boot / accept-invite —
 // no sidebar, no session assumed yet.
+const { locale } = useVocabulary()
+useHead({ htmlAttrs: { lang: locale } })
 </script>
 
 <template>

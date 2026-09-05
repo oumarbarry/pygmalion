@@ -44,36 +44,26 @@ export interface AdminRegionDetail {
  * no route exposes `region_country`, so the picker can't be fetched. Delete
  * this constant the day a `GET /admin/countries` exists.
  */
-export const COUNTRIES: readonly { iso2: string; name: string }[] = [
-  { iso2: 'DE', name: 'Allemagne' },
-  { iso2: 'AU', name: 'Australie' },
-  { iso2: 'BE', name: 'Belgique' },
-  { iso2: 'BR', name: 'Brésil' },
-  { iso2: 'CA', name: 'Canada' },
-  { iso2: 'CN', name: 'Chine' },
-  { iso2: 'DK', name: 'Danemark' },
-  { iso2: 'ES', name: 'Espagne' },
-  { iso2: 'US', name: 'États-Unis' },
-  { iso2: 'FR', name: 'France' },
-  { iso2: 'IE', name: 'Irlande' },
-  { iso2: 'IT', name: 'Italie' },
-  { iso2: 'JP', name: 'Japon' },
-  { iso2: 'IN', name: 'Inde' },
-  { iso2: 'MX', name: 'Mexique' },
-  { iso2: 'NO', name: 'Norvège' },
-  { iso2: 'NZ', name: 'Nouvelle-Zélande' },
-  { iso2: 'NL', name: 'Pays-Bas' },
-  { iso2: 'PL', name: 'Pologne' },
-  { iso2: 'PT', name: 'Portugal' },
-  { iso2: 'GB', name: 'Royaume-Uni' },
-  { iso2: 'SG', name: 'Singapour' },
-  { iso2: 'ZA', name: 'Afrique du Sud' },
-  { iso2: 'SE', name: 'Suède' },
-  { iso2: 'CH', name: 'Suisse' },
+export const COUNTRY_CODES: readonly string[] = [
+  'DE', 'AU', 'BE', 'BR', 'CA', 'CN', 'DK', 'ES', 'US', 'FR', 'IE', 'IT', 'JP', 'IN', 'MX',
+  'NO', 'NZ', 'NL', 'PL', 'PT', 'GB', 'SG', 'ZA', 'SE', 'CH',
 ]
 
-export function countryName(iso2: string): string {
-  return COUNTRIES.find((c) => c.iso2 === iso2.toUpperCase())?.name ?? iso2.toUpperCase()
+/** Country name in the admin's language; the code itself when it is not a valid region code. */
+export function countryName(iso2: string, locale = 'en-US'): string {
+  const code = iso2.toUpperCase()
+  try {
+    return new Intl.DisplayNames([locale], { type: 'region' }).of(code) ?? code
+  } catch {
+    return code
+  }
+}
+
+/** The picker rows, named and sorted for one language. */
+export function countryList(locale = 'en-US'): { iso2: string; name: string }[] {
+  return COUNTRY_CODES.map((iso2) => ({ iso2, name: countryName(iso2, locale) })).sort((a, b) =>
+    a.name.localeCompare(b.name, locale),
+  )
 }
 
 // --- Taxes ----------------------------------------------------------------------
@@ -248,15 +238,15 @@ export interface AdminNotification {
 export function useSettingsNav(): ComputedRef<PygSubNavItem[]> {
   const { t } = useVocabulary()
   return computed(() => [
-    { label: t('setNavStore'), to: '/admin/reglages', icon: 'i-lucide-store', exact: true },
-    { label: t('setNavRegions'), to: '/admin/reglages/zones-de-vente', icon: 'i-lucide-globe' },
-    { label: t('setNavTaxes'), to: '/admin/reglages/taxes', icon: 'i-lucide-percent' },
-    { label: t('setNavShipping'), to: '/admin/reglages/livraison', icon: 'i-lucide-truck' },
-    { label: t('setNavChannels'), to: '/admin/reglages/canaux', icon: 'i-lucide-radio' },
-    { label: t('setNavKeys'), to: '/admin/reglages/cles', icon: 'i-lucide-key-round' },
-    { label: t('setNavTeam'), to: '/admin/reglages/equipe', icon: 'i-lucide-users' },
-    { label: t('setNavWebhooks'), to: '/admin/reglages/webhooks', icon: 'i-lucide-webhook' },
-    { label: t('setNavMessages'), to: '/admin/reglages/messages', icon: 'i-lucide-send' },
+    { label: t('setNavStore'), to: '/admin/settings', icon: 'i-lucide-store', exact: true },
+    { label: t('setNavRegions'), to: '/admin/settings/regions', icon: 'i-lucide-globe' },
+    { label: t('setNavTaxes'), to: '/admin/settings/taxes', icon: 'i-lucide-percent' },
+    { label: t('setNavShipping'), to: '/admin/settings/shipping', icon: 'i-lucide-truck' },
+    { label: t('setNavChannels'), to: '/admin/settings/channels', icon: 'i-lucide-radio' },
+    { label: t('setNavKeys'), to: '/admin/settings/api-keys', icon: 'i-lucide-key-round' },
+    { label: t('setNavTeam'), to: '/admin/settings/team', icon: 'i-lucide-users' },
+    { label: t('setNavWebhooks'), to: '/admin/settings/webhooks', icon: 'i-lucide-webhook' },
+    { label: t('setNavMessages'), to: '/admin/settings/messages', icon: 'i-lucide-send' },
   ])
 }
 

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import {
-  COUNTRIES,
+  COUNTRY_CODES,
+  countryList,
   DOMAIN_EVENT_GROUPS,
   countryName,
   deliveryStatusDisplay,
@@ -71,11 +72,14 @@ describe('country mirror of COUNTRY_SEED', () => {
   it('resolves a known code, is case-insensitive, and falls back to the raw code', () => {
     expect(countryName('FR')).toBe('France')
     expect(countryName('fr')).toBe('France')
-    expect(countryName('ZZ')).toBe('ZZ')
+    expect(countryName('DE', 'fr-FR')).toBe('Allemagne')
+    expect(countryName('DE', 'en-US')).toBe('Germany')
+    expect(countryName('Z')).toBe('Z')
   })
 
   it('has one row per iso2 (a duplicate would render two identical checkboxes)', () => {
-    expect(new Set(COUNTRIES.map((c) => c.iso2)).size).toBe(COUNTRIES.length)
+    expect(new Set(COUNTRY_CODES).size).toBe(COUNTRY_CODES.length)
+    expect(countryList('en-US').map((c) => c.iso2).sort()).toEqual([...COUNTRY_CODES].sort())
   })
 })
 

@@ -1,12 +1,14 @@
-import { defaultLocale, vocabulary, type Locale, type VocabKey } from '../utils/vocabulary'
+import { detectLocale, LOCALE_STORAGE_KEY, vocabulary, type Locale, type VocabKey } from '../utils/vocabulary'
 
 /**
  * The one place every screen goes through for user-facing
  * text. `useState` keeps the chosen locale shared app-wide (client-only,
  * /admin/** is ssr:false) without needing a routing-aware i18n module.
+ * English by default, French when the browser says so, and the merchant's
+ * explicit choice (user menu) is remembered in localStorage.
  */
 export function useVocabulary() {
-  const locale = useState<Locale>('admin-locale', () => defaultLocale)
+  const locale = useState<Locale>('admin-locale', detectLocale)
 
   function t(key: VocabKey): string {
     return vocabulary[locale.value][key]
@@ -14,6 +16,11 @@ export function useVocabulary() {
 
   function setLocale(next: Locale) {
     locale.value = next
+    try {
+      window.localStorage.setItem(LOCALE_STORAGE_KEY, next)
+    } catch {
+      // storage unavailable: the choice lasts for the session only
+    }
   }
 
   return { locale, t, setLocale }

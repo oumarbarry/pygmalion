@@ -818,7 +818,21 @@ const en: Record<BaseVocabKey, string> = {
   deletePricePreferenceBody: 'The prices concerned go back to tax-excluded: tax will be added at checkout.',
 }
 
-export const defaultLocale: Locale = 'fr'
+export const defaultLocale: Locale = 'en'
+export const locales: readonly Locale[] = ['en', 'fr']
+export const LOCALE_STORAGE_KEY = 'pygmalion-admin-locale'
+
+/** The stored choice, else the browser language when it is one of ours, else English. */
+export function detectLocale(): Locale {
+  if (typeof window === 'undefined') return defaultLocale
+  try {
+    const stored = window.localStorage.getItem(LOCALE_STORAGE_KEY)
+    if (stored === 'en' || stored === 'fr') return stored
+  } catch {
+    // storage unavailable (private mode, blocked): fall through to the browser language
+  }
+  return window.navigator?.language?.toLowerCase().startsWith('fr') ? 'fr' : defaultLocale
+}
 
 // --- Commandes / RMA / brouillons / encaissements ----------------------------
 // Appended as its own block (union + records merged at the bottom of the file)

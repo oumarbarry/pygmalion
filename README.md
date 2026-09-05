@@ -27,7 +27,7 @@ Postgres to install. PGlite is embedded for development.
 
 ## Quick start
 
-Requirements: Node 22 or newer and pnpm 11.
+Requirements: Node 22 or newer and pnpm 12.
 
 ```bash
 git clone https://github.com/oumarbarry/pygmalion.git
@@ -77,7 +77,8 @@ to a paid and shipped order.
 The admin is not a copy of Medusa's. Navigation follows a merchant's tasks
 (Today, Orders, Products, Customers, Promotions, Settings), composed
 operations run as step-by-step wizards, and jargon stays out: you ship an
-order, you do not "create a fulfillment". It works on a phone.
+order, you do not "create a fulfillment". It works on a phone, in English or
+in French.
 
 ## Packages
 
@@ -133,9 +134,9 @@ order, you do not "create a fulfillment". It works on a phone.
   storefront.
 - The default notification provider writes to the database and sends
   nothing. Plugging in a transport is a ten-line module.
-- The admin and the demo storefront are in French. The admin's text goes
-  through a vocabulary that already has an English dictionary, but screens
-  still carry French strings. Full English is on the roadmap.
+- The admin speaks English and French only (English by default, French when
+  the browser asks for it, switchable from the user menu). The demo
+  storefront's copy is in French.
 - No migration from Medusa.
 
 ## Development

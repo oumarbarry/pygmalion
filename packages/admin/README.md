@@ -2,8 +2,8 @@
 
 The admin of [Pygmalion](https://github.com/oumarbarry/pygmalion), as a Nuxt
 layer mounted on `/admin`. Task-based navigation, wizards for composed
-operations, light and dark themes, usable on a phone. The interface is in
-French.
+operations, light and dark themes, usable on a phone. English by default,
+French from the user menu.
 
 ```ts
 // nuxt.config.ts
