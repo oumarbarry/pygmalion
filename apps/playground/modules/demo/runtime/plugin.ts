@@ -1,4 +1,4 @@
-import { seedDemoStore } from './seed'
+import { demoLocale, seedDemoStore } from './seed'
 import { seedDevStaff } from './staff'
 
 // Nitro plugin (auto-imports: defineNitroPlugin, waitForPygmalionContext,
@@ -34,7 +34,7 @@ export default defineNitroPlugin(async (nitroApp) => {
   // suite keeps the empty store its own fixtures assume; the shopping
   // journeys ask for the demo data explicitly via `POST /api/_demo/seed`.
   if (import.meta.dev) {
-    const result = await seedDemoStore(services)
+    const result = await seedDemoStore(services, { locale: demoLocale() })
     const staff = await seedDevStaff()
     console.log(
       `[demo] shop ready: ${result.products} products, ${result.collections} collections, `

@@ -2,6 +2,7 @@
 const client = usePygmalion()
 const route = useRoute()
 const { regionId, currencyCode } = useShop()
+const { t } = useShopText()
 
 const id = computed(() => String(route.params.id))
 
@@ -17,18 +18,18 @@ const { data, pending, error, refresh } = await useAsyncData(
   { watch: [regionId, id] },
 )
 
-useSeoMeta({ title: () => data.value?.collection.title ?? 'Collection' })
+useSeoMeta({ title: () => data.value?.collection.title ?? t('productCollectionFallback') })
 </script>
 
 <template>
   <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
     <NuxtLink to="/products" class="inline-flex items-center gap-1.5 text-sm text-muted hover:text-highlighted">
       <UIcon name="i-lucide-arrow-left" class="size-4" />
-      Toute la boutique
+      {{ t('navAllProducts') }}
     </NuxtLink>
 
     <h1 class="shop-display mt-4 text-3xl text-highlighted sm:text-4xl">
-      {{ data?.collection.title ?? 'Collection' }}
+      {{ data?.collection.title ?? t('productCollectionFallback') }}
     </h1>
 
     <ProductGrid
@@ -37,8 +38,8 @@ useSeoMeta({ title: () => data.value?.collection.title ?? 'Collection' })
       :currency="currencyCode"
       :pending="pending"
       :error="error"
-      empty-title="Cette collection est vide"
-      empty-message="Aucun produit n'y est encore rattaché."
+      :empty-title="t('productCollectionEmptyTitle')"
+      :empty-message="t('productCollectionEmptyMessage')"
       @retry="refresh()"
     />
   </div>

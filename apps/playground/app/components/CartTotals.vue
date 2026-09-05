@@ -10,16 +10,17 @@ import type { FullCart } from '@oumarbarry/pygmalion-core'
  * actually computed.
  */
 const props = defineProps<{ cart: FullCart | null; showShippingHint?: boolean }>()
+const { t, money } = useShopText()
 
 const currency = computed(() => props.cart?.currencyCode)
 const rows = computed(() => {
   const c = props.cart
   if (!c) return []
   return [
-    { key: 'subtotal', label: 'Sous-total', amount: c.itemsSubtotal, show: true },
-    { key: 'discount', label: 'Remise', amount: -c.discountTotal, show: c.discountTotal > 0 },
-    { key: 'shipping', label: 'Livraison', amount: c.shippingTotal, show: c.shippingMethods.length > 0 },
-    { key: 'tax', label: 'Taxes', amount: c.taxTotal, show: c.taxTotal > 0 },
+    { key: 'subtotal', label: t('commonSubtotal'), amount: c.itemsSubtotal, show: true },
+    { key: 'discount', label: t('commonDiscount'), amount: -c.discountTotal, show: c.discountTotal > 0 },
+    { key: 'shipping', label: t('commonShipping'), amount: c.shippingTotal, show: c.shippingMethods.length > 0 },
+    { key: 'tax', label: t('commonTaxes'), amount: c.taxTotal, show: c.taxTotal > 0 },
   ].filter((r) => r.show)
 })
 </script>
@@ -29,20 +30,20 @@ const rows = computed(() => {
     <div v-for="row in rows" :key="row.key" class="flex items-baseline justify-between">
       <dt class="text-muted">{{ row.label }}</dt>
       <dd class="shop-num text-toned" :data-amount="row.amount" :data-testid="`cart-${row.key}`">
-        {{ formatMoney(row.amount, currency) }}
+        {{ money(row.amount, currency) }}
       </dd>
     </div>
     <div
       v-if="showShippingHint && !cart.shippingMethods.length"
       class="flex items-baseline justify-between text-muted"
     >
-      <dt>Livraison</dt>
-      <dd class="text-xs">calculée à l'étape suivante</dd>
+      <dt>{{ t('commonShipping') }}</dt>
+      <dd class="text-xs">{{ t('cartShippingHint') }}</dd>
     </div>
     <div class="flex items-baseline justify-between border-t border-default pt-2.5">
-      <dt class="font-semibold text-highlighted">Total</dt>
+      <dt class="font-semibold text-highlighted">{{ t('commonTotal') }}</dt>
       <dd class="shop-price text-lg text-highlighted" :data-amount="cart.total" data-testid="cart-total">
-        {{ formatMoney(cart.total, currency) }}
+        {{ money(cart.total, currency) }}
       </dd>
     </div>
   </dl>

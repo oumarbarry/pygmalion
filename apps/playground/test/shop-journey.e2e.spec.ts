@@ -3,6 +3,12 @@ import { createPygmalionClient, type PygmalionClient } from '@oumarbarry/pygmali
 import { $fetch, fetch, setup, url } from '@nuxt/test-utils/e2e'
 import { beforeAll, describe, expect, it } from 'vitest'
 import { seedOwnerSession } from './support/staff'
+import { catalogFor } from '../modules/demo/runtime/catalog'
+
+// The English seed the suite shops against: expectations follow the data, not a copy of it.
+const demo = catalogFor('en')
+const onsen = demo.products.find((p) => p.handle === 'onsen-teapot')!
+const titleOf = (handle: string) => demo.products.find((p) => p.handle === handle)!.title
 
 interface AdminOrder {
   id: string
@@ -68,7 +74,7 @@ describe('full shopping journey (e2e)', async () => {
     const { regions } = await client().store.regions.list()
     eurRegionId = regions.find((r) => r.currencyCode === 'eur')!.id
     const { products } = await client().store.products.list({ limit: 30 })
-    teapotId = products.find((p) => p.handle === 'theiere-onsen')!.id
+    teapotId = products.find((p) => p.handle === onsen.handle)!.id
   })
 
   it('SEED: idempotent — a second run changes no count', async () => {
@@ -77,7 +83,7 @@ describe('full shopping journey (e2e)', async () => {
 
     const { products } = await createPygmalionClient({ baseUrl: url('/') }).store.products.list({ limit: 50 })
     // 20 demo products + the 2 the runtime suite relies on, never doubled.
-    expect(products.filter((p) => p.handle?.startsWith('theiere'))).toHaveLength(2)
+    expect(products.filter((p) => p.handle?.endsWith('-teapot'))).toHaveLength(2)
   })
 
   // --- Parcours invité --------------------------------------------------------
@@ -95,7 +101,7 @@ describe('full shopping journey (e2e)', async () => {
 
       expect(html).toContain('Maison Pygmalion')
       // The home shows the 12 latest arrivals: the last ones the seed created.
-      expect(html).toContain('Carnet relié')
+      expect(html).toContain(titleOf('bound-notebook'))
       // The storefront suite pins this string; the footer carries it.
       expect(html).toContain('Pygmalion playground')
     })
@@ -111,8 +117,8 @@ describe('full shopping journey (e2e)', async () => {
       const { product } = await client().store.products.get(teapotId, { region_id: eurRegionId })
 
       expect(product.images.map((i) => i.url)).toEqual(['/demo/theiere-onsen-1.jpg', '/demo/theiere-onsen-2.jpg'])
-      expect(product.options.map((o) => o.title)).toEqual(['Couleur'])
-      expect(product.options[0].values.map((v) => v.value)).toEqual(['Bleu nuit', 'Terre cuite'])
+      expect(product.options.map((o) => o.title)).toEqual(onsen.options!.map((o) => o.title))
+      expect(product.options[0].values.map((v) => v.value)).toEqual(onsen.options![0]!.values)
 
       // The picker resolves a variant from the chosen option values — the same
       // pure function the page uses.
@@ -122,7 +128,7 @@ describe('full shopping journey (e2e)', async () => {
       variantId = variant.id
 
       const html = await (await fetch(`/products/${teapotId}`)).text()
-      expect(html).toContain('Théière Onsen')
+      expect(html).toContain(onsen.title)
       expect(html).toContain(variantId)
       expect(html).toContain('/demo/theiere-onsen-1.jpg')
     })
@@ -134,15 +140,15 @@ describe('full shopping journey (e2e)', async () => {
       expect(withItem.itemsSubtotal).toBe(11800)
 
       const html = await (await fetch('/cart', { headers: { cookie: `pygmalion_cart=${cartId}; ${cookieHeader()}` } })).text()
-      expect(html).toContain('Théière Onsen')
+      expect(html).toContain(onsen.title)
       expect(html).toContain('data-amount="11800"')
     })
 
     it('the promo code is applied by the server, not computed client-side', async () => {
-      const { cart } = await client().store.carts.addPromotions(cartId, { promotionCodes: ['BIENVENUE10'] })
+      const { cart } = await client().store.carts.addPromotions(cartId, { promotionCodes: [demo.promoCode] })
 
       expect(cart.discountTotal).toBe(1180) // 10 % de 118,00 €
-      expect(cart.items[0].adjustments.map((a) => a.code)).toContain('BIENVENUE10')
+      expect(cart.items[0].adjustments.map((a) => a.code)).toContain(demo.promoCode)
 
       // An unknown code breaks nothing and leaves the cart intact.
       await expect(client().store.carts.addPromotions(cartId, { promotionCodes: ['NIMPORTEQUOI'] })).rejects.toMatchObject({
@@ -166,7 +172,7 @@ describe('full shopping journey (e2e)', async () => {
 
     it('shipping: options eligible for this address, VAT applied by the server', async () => {
       const { shippingOptions } = await client().store.shippingOptions.list({ cart_id: cartId })
-      expect(shippingOptions.map((o) => o.name)).toEqual(['Colissimo — 3 à 5 jours', 'Express — 24 h'])
+      expect(shippingOptions.map((o) => o.name)).toEqual(demo.shipping.map((o) => o.name))
 
       const { cart } = await client().store.carts.setShippingMethod(cartId, { shippingOptionId: shippingOptions[0].id })
       expect(cart.shippingMethods).toHaveLength(1)
@@ -198,8 +204,8 @@ describe('full shopping journey (e2e)', async () => {
       expect(order.items[0].returnableQuantity).toBe(0) // rien d'expédié encore
 
       const html = await (await fetch(`/order/${orderId}?email=${encodeURIComponent(email)}`)).text()
-      expect(html).toContain(`N° ${order.displayId}`)
-      expect(html).toContain('Théière Onsen')
+      expect(html).toContain(`#${order.displayId}`)
+      expect(html).toContain(onsen.title)
 
       // An email that is not the order's gets no access.
       await expect(client().store.orders.get(orderId, { email: 'autre@test.pygmalion.dev' })).rejects.toMatchObject({ status: 403 })
@@ -233,7 +239,7 @@ describe('full shopping journey (e2e)', async () => {
 
     it('the guest cart is attached to the account before becoming an order', async () => {
       const { products } = await client().store.products.list({ limit: 30, region_id: eurRegionId })
-      const soap = products.find((p) => p.handle === 'savon-avoine')!
+      const soap = products.find((p) => p.handle === 'oat-milk-soap')!
       const { product } = await client().store.products.get(soap.id, { region_id: eurRegionId })
 
       const { cart } = await client().store.carts.create({ regionId: eurRegionId })
@@ -261,12 +267,12 @@ describe('full shopping journey (e2e)', async () => {
       expect(orders.map((o) => o.id)).toContain(orderId)
 
       const html = await (await fetch('/account/orders', { headers: { cookie: cookieHeader() } })).text()
-      expect(html).toContain(`N° ${displayId}`)
+      expect(html).toContain(`#${displayId}`)
     })
 
     it('the detail renders, and the address book does its CRUD', async () => {
       const html = await (await fetch(`/account/orders/${orderId}`, { headers: { cookie: cookieHeader() } })).text()
-      expect(html).toContain('Savon Lait d\'Avoine')
+      expect(html).toContain(titleOf('oat-milk-soap'))
       expect(html).toContain('3 quai Ceineray')
 
       const { address } = await client().store.customers.addresses.create({

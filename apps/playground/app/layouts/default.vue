@@ -4,6 +4,7 @@
  * chrome components and owns nothing else.
  */
 const shop = useShop()
+const { t, locale, setLocale } = useShopText()
 const drawer = useTemplateRef<{ setCodeError: (m: string) => void }>('drawer')
 const busy = ref(false)
 
@@ -43,7 +44,7 @@ async function changeRegion(id: string) {
     <a
       href="#contenu"
       class="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-lg focus:bg-inverted focus:px-4 focus:py-2 focus:text-inverted"
-    >Aller au contenu</a>
+    >{{ t('commonSkipToContent') }}</a>
 
     <ShopHeader
       :collections="shop.collections.value"
@@ -51,8 +52,10 @@ async function changeRegion(id: string) {
       :current-region-id="shop.regionId.value"
       :item-count="shop.itemCount.value"
       :customer-name="shop.customer.value?.name ?? null"
+      :locale="locale"
       @open-cart="shop.openDrawer()"
       @select-region="changeRegion"
+      @select-locale="setLocale"
     />
 
     <main id="contenu" class="flex-1">

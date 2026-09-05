@@ -40,7 +40,8 @@ pnpm dev        # http://localhost:3648
 On first start, a PGlite database is created under `apps/playground/.data/`,
 the schema is pushed, and the demo shop is seeded: 20 products with photos,
 2 collections, 5 categories, 2 regions (EUR and USD) with VAT and sales tax,
-2 shipping options, 2 promotions.
+2 shipping options, 2 promotions. The catalog copy is seeded in English, or
+in French with `DEMO_LOCALE=fr`.
 
 The admin is at <http://localhost:3648/admin>, with a development account:
 
@@ -89,7 +90,7 @@ in French.
 | `@oumarbarry/pygmalion-admin` | The admin, a Nuxt layer (49 screens, Nuxt UI v4 in unstyled mode) |
 | `@oumarbarry/pygmalion-sdk` | Typed HTTP client with zero dependencies, plus storefront composables |
 | `@oumarbarry/pygmalion-stripe` | Stripe payment provider, and the reference example of a module |
-| `apps/playground` | "Maison Pygmalion", the demo shop and the E2E bench |
+| `apps/playground` | "Maison Pygmalion", the demo shop (English or French) and the E2E bench |
 
 ## How it is built
 
@@ -134,9 +135,8 @@ in French.
   storefront.
 - The default notification provider writes to the database and sends
   nothing. Plugging in a transport is a ten-line module.
-- The admin speaks English and French only (English by default, French when
-  the browser asks for it, switchable from the user menu). The demo
-  storefront's copy is in French.
+- English and French only, for the admin and the demo shop (English by
+  default, French when the browser asks for it, switchable in both).
 - No migration from Medusa.
 
 ## Development

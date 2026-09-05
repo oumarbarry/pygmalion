@@ -5,10 +5,11 @@
 // and carries the request's cookies.
 const client = usePygmalion()
 const { regionId, currencyCode, collections } = useShop()
+const { t, tf, money } = useShopText()
 
 useSeoMeta({
-  title: 'Objets pour la maison',
-  description: 'Céramique, lumière, textile et papeterie choisis pour durer. Expédié depuis Nantes sous 48 h.',
+  title: () => t('homeTitle'),
+  description: () => t('homeDescription'),
 })
 
 // The whole page is one listing call: the newest twelve, priced in the visitor's
@@ -29,13 +30,12 @@ const hero = computed(() => newest.value.find((p) => p.thumbnail) ?? null)
     <section class="border-b border-default">
       <div class="mx-auto grid max-w-6xl items-center gap-10 px-4 py-14 sm:px-6 lg:grid-cols-2 lg:py-20">
         <div>
-          <h1 class="shop-display text-4xl text-highlighted sm:text-5xl lg:text-6xl">Des objets qu'on garde.</h1>
+          <h1 class="shop-display text-4xl text-highlighted sm:text-5xl lg:text-6xl">{{ t('homeHeroTitle') }}</h1>
           <p class="shop-prose mt-5 text-base leading-relaxed text-muted sm:text-lg">
-            Céramique tournée, laine tissée, bois massif. Une petite sélection pour la maison, choisie pour vieillir
-            correctement — et expédiée de Nantes sous 48 heures.
+            {{ t('homeHeroText') }}
           </p>
           <div class="mt-8 flex flex-wrap gap-3">
-            <UButton to="/products" size="lg" color="primary" label="Voir la boutique" />
+            <UButton to="/products" size="lg" color="primary" :label="t('commonBrowseShop')" />
             <UButton
               v-if="collections[0]"
               :to="`/collections/${collections[0].id}`"
@@ -45,7 +45,7 @@ const hero = computed(() => newest.value.find((p) => p.thumbnail) ?? null)
               :label="collections[0].title"
             />
           </div>
-          <p class="mt-6 text-sm text-dimmed">Livraison offerte dès 80&nbsp;€ · Retours acceptés 30 jours</p>
+          <p class="mt-6 text-sm text-dimmed">{{ tf('homePerks', { amount: money(8000, 'eur') }) }}</p>
         </div>
 
         <NuxtLink v-if="hero" :to="`/products/${hero.id}`" class="group block">
@@ -59,7 +59,7 @@ const hero = computed(() => newest.value.find((p) => p.thumbnail) ?? null)
             >
           </div>
           <p class="mt-3 text-sm text-muted">
-            Dernière arrivée — <span class="font-semibold text-highlighted">{{ hero.title }}</span>
+            {{ t('homeLatestArrival') }} <span class="font-semibold text-highlighted">{{ hero.title }}</span>
           </p>
         </NuxtLink>
       </div>
@@ -67,7 +67,7 @@ const hero = computed(() => newest.value.find((p) => p.thumbnail) ?? null)
 
     <!-- Collections: two doors, not a grid of identical icon cards. -->
     <section v-if="collections.length" class="mx-auto max-w-6xl px-4 py-14 sm:px-6">
-      <h2 class="shop-display text-2xl text-highlighted sm:text-3xl">Nos collections</h2>
+      <h2 class="shop-display text-2xl text-highlighted sm:text-3xl">{{ t('homeCollections') }}</h2>
       <div class="mt-6 grid gap-4 sm:grid-cols-2">
         <NuxtLink
           v-for="c in collections"
@@ -77,7 +77,7 @@ const hero = computed(() => newest.value.find((p) => p.thumbnail) ?? null)
         >
           <span>
             <span class="block text-lg font-bold text-highlighted">{{ c.title }}</span>
-            <span class="mt-1 block text-sm text-muted">Découvrir la sélection</span>
+            <span class="mt-1 block text-sm text-muted">{{ t('homeDiscover') }}</span>
           </span>
           <UIcon
             name="i-lucide-arrow-right"
@@ -89,12 +89,12 @@ const hero = computed(() => newest.value.find((p) => p.thumbnail) ?? null)
 
     <section class="mx-auto max-w-6xl px-4 pb-8 sm:px-6">
       <div class="flex items-baseline justify-between gap-4">
-        <h2 class="shop-display text-2xl text-highlighted sm:text-3xl">Nouveautés</h2>
+        <h2 class="shop-display text-2xl text-highlighted sm:text-3xl">{{ t('homeNew') }}</h2>
         <NuxtLink
           to="/products"
           class="shrink-0 text-sm font-medium text-muted underline-offset-4 hover:text-highlighted hover:underline"
         >
-          Tout voir
+          {{ t('commonSeeAll') }}
         </NuxtLink>
       </div>
 
@@ -104,8 +104,8 @@ const hero = computed(() => newest.value.find((p) => p.thumbnail) ?? null)
         :error="error"
         :empty="!newest.length"
         :skeleton="8"
-        empty-title="La boutique est encore vide"
-        empty-message="Ajoutez des produits depuis l'administration, ils apparaîtront ici."
+        :empty-title="t('homeEmptyTitle')"
+        :empty-message="t('homeEmptyMessage')"
         @retry="refresh()"
       >
         <div class="grid grid-cols-2 gap-x-4 gap-y-8 sm:grid-cols-3 lg:grid-cols-4">

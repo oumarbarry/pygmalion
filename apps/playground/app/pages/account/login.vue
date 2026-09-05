@@ -9,8 +9,9 @@
 const route = useRoute()
 const { signIn, signUp, isAuthenticated } = useCustomer()
 const { attachCustomer, cartId } = useShop()
+const { t } = useShopText()
 
-useSeoMeta({ title: 'Se connecter' })
+useSeoMeta({ title: () => t('accountSignIn') })
 
 const mode = ref<'signin' | 'signup'>(route.query.mode === 'signup' ? 'signup' : 'signin')
 const email = ref('')
@@ -36,7 +37,7 @@ async function submit() {
   } catch (err) {
     error.value =
       err instanceof Error && /invalid|credential|password/i.test(err.message)
-        ? 'E-mail ou mot de passe incorrect.'
+        ? t('accountBadCredentials')
         : err instanceof Error
           ? err.message
           : String(err)
@@ -49,24 +50,20 @@ async function submit() {
 <template>
   <div class="mx-auto max-w-md px-4 py-14 sm:px-6">
     <h1 class="shop-display text-3xl text-highlighted">
-      {{ mode === 'signin' ? 'Se connecter' : 'Créer un compte' }}
+      {{ t(mode === 'signin' ? 'accountSignIn' : 'accountCreate') }}
     </h1>
     <p class="mt-2 text-muted">
-      {{
-        mode === 'signin'
-          ? 'Pour retrouver vos commandes et vos adresses.'
-          : 'Vos adresses enregistrées, vos commandes au même endroit.'
-      }}
+      {{ t(mode === 'signin' ? 'accountSignInText' : 'accountSignUpText') }}
     </p>
 
     <form class="mt-8 space-y-4" @submit.prevent="submit">
-      <UFormField v-if="mode === 'signup'" label="Nom">
+      <UFormField v-if="mode === 'signup'" :label="t('commonName')">
         <UInput v-model="name" autocomplete="name" class="w-full" data-testid="signup-name" />
       </UFormField>
-      <UFormField label="Adresse e-mail" required>
+      <UFormField :label="t('commonEmail')" required>
         <UInput v-model="email" type="email" autocomplete="email" required class="w-full" data-testid="auth-email" />
       </UFormField>
-      <UFormField label="Mot de passe" required :hint="mode === 'signup' ? '8 caractères minimum' : undefined">
+      <UFormField :label="t('commonPassword')" required :hint="mode === 'signup' ? t('accountPasswordHint') : undefined">
         <UInput
           v-model="password"
           type="password"
@@ -86,25 +83,25 @@ async function submit() {
         block
         color="primary"
         :loading="busy"
-        :label="mode === 'signin' ? 'Se connecter' : 'Créer mon compte'"
+        :label="t(mode === 'signin' ? 'accountSignIn' : 'accountCreateMine')"
         data-testid="auth-submit"
       />
     </form>
 
     <p class="mt-6 text-center text-sm text-muted">
-      {{ mode === 'signin' ? 'Pas encore de compte ?' : 'Vous avez déjà un compte ?' }}
+      {{ t(mode === 'signin' ? 'accountNoAccount' : 'accountHaveAccount') }}
       <button
         type="button"
         class="underline underline-offset-2 hover:text-highlighted"
         data-testid="auth-toggle"
         @click="mode = mode === 'signin' ? 'signup' : 'signin'"
       >
-        {{ mode === 'signin' ? 'Créer un compte' : 'Se connecter' }}
+        {{ t(mode === 'signin' ? 'accountCreate' : 'accountSignIn') }}
       </button>
     </p>
     <p class="mt-3 text-center text-sm text-dimmed">
-      Commande passée sans compte ?
-      <NuxtLink to="/order" class="underline underline-offset-2 hover:text-muted">Suivez-la par e-mail</NuxtLink>.
+      {{ t('accountGuestOrder') }}
+      <NuxtLink to="/order" class="underline underline-offset-2 hover:text-muted">{{ t('accountTrackByEmail') }}</NuxtLink>.
     </p>
   </div>
 </template>

@@ -1,21 +1,16 @@
 <script setup lang="ts">
 import type { StoreProductListItem } from '@oumarbarry/pygmalion-sdk'
 
-withDefaults(
-  defineProps<{
-    products: StoreProductListItem[]
-    currency?: string
-    pending?: boolean
-    error?: unknown
-    emptyTitle?: string
-    emptyMessage?: string
-  }>(),
-  {
-    emptyTitle: 'Aucun produit ici',
-    emptyMessage: 'Essayez un autre rayon, ou retirez les filtres.',
-  },
-)
+defineProps<{
+  products: StoreProductListItem[]
+  currency?: string
+  pending?: boolean
+  error?: unknown
+  emptyTitle?: string
+  emptyMessage?: string
+}>()
 const emit = defineEmits<{ retry: [] }>()
+const { t } = useShopText()
 </script>
 
 <template>
@@ -24,8 +19,8 @@ const emit = defineEmits<{ retry: [] }>()
     :error="error"
     :empty="!products.length"
     :skeleton="6"
-    :empty-title="emptyTitle"
-    :empty-message="emptyMessage"
+    :empty-title="emptyTitle ?? t('productGridEmptyTitle')"
+    :empty-message="emptyMessage ?? t('productGridEmptyMessage')"
     empty-icon="i-lucide-search-x"
     @retry="emit('retry')"
   >

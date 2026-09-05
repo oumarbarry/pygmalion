@@ -1,41 +1,31 @@
 import type { PygmalionServices } from '@oumarbarry/pygmalion'
-import { CATEGORIES, COLLECTIONS, PRODUCTS, type SeedProduct } from './catalog'
+import { catalogFor, type DemoCatalog, type DemoLocale, type SeedProduct } from './catalog'
 
 /**
  * The demo shop, seeded from `catalog.ts` (`pnpm dev` must open on a real
- * store, not an empty admin).
+ * store, not an empty admin). One language per run: English unless asked
+ * (`DEMO_LOCALE=fr`, or `{ locale }` from the seed route).
  *
  * IDEMPOTENT step by step, not with one global "already seeded?" flag: every
  * block looks up its own row by handle / name / code before creating it. A run
  * interrupted halfway (or a catalogue that grew since the last boot) is fixed
  * by simply booting again, which is the only behaviour that survives a
- * developer editing `catalog.ts`.
+ * developer editing `catalog.ts`. Name lookups use the language being seeded.
  *
  * Runs in dev only (see `plugin.ts`) — E2E suites call it explicitly through
  * `POST /api/_demo/seed` so a suite that wants an empty store still gets one.
  */
 
-// Order matters: `regions.list()` answers newest-first, and `useRegion` falls
-// back to the first row, so the region created LAST is what a first-time
-// visitor is priced in. Europe/EUR is this shop's home market.
-const REGIONS = [
-  { name: 'United States', currencyCode: 'usd', countries: ['US', 'CA'] },
-  { name: 'Europe', currencyCode: 'eur', countries: ['FR', 'BE', 'DE', 'ES', 'IT', 'NL', 'PT'] },
-] as const
-
-/** Example rates — a real store configures its own per country/province. */
-const TAX = [
-  { countryCode: 'FR', code: 'TVA20', name: 'TVA 20 %', rate: 20 },
-  { countryCode: 'US', code: 'SALES', name: 'Sales tax', rate: 8.25 },
-] as const
-
-const SHIPPING = [
-  { name: 'Colissimo — 3 à 5 jours', eur: 590, usd: 690 },
-  { name: 'Express — 24 h', eur: 1400, usd: 1600 },
-] as const
-
 const FREE_SHIPPING_THRESHOLD = 8000 // minor units, in whichever currency the cart is
-export const PROMO_CODE = 'BIENVENUE10'
+
+/** The default language: `DEMO_LOCALE=fr` for French, anything else is English. */
+export function demoLocale(): DemoLocale {
+  return process.env.DEMO_LOCALE === 'fr' ? 'fr' : 'en'
+}
+
+export const promoCodeFor = (locale: DemoLocale): string => catalogFor(locale).promoCode
+/** The code of the English default. */
+export const PROMO_CODE = promoCodeFor('en')
 
 export interface SeedResult {
   products: number
@@ -46,19 +36,23 @@ export interface SeedResult {
   promotions: number
 }
 
-export async function seedDemoStore(services: PygmalionServices): Promise<SeedResult> {
+export async function seedDemoStore(
+  services: PygmalionServices,
+  options: { locale?: DemoLocale } = {},
+): Promise<SeedResult> {
+  const catalog = catalogFor(options.locale ?? demoLocale())
   await services.currencies.seed()
 
   // --- Store, regions, taxes -------------------------------------------------
   const store = await services.stores.ensure()
-  await services.stores.update(store.id, { name: 'Maison Pygmalion' })
+  await services.stores.update(store.id, { name: catalog.storeName })
   await services.stores.setSupportedCurrencies(store.id, [
     { code: 'eur', isDefault: true },
     { code: 'usd' },
   ])
 
   const regionIds = new Map<string, string>()
-  for (const r of REGIONS) {
+  for (const r of catalog.regions) {
     const [existing] = await services.regions.list({ q: r.name, limit: 1 })
     const region = existing ?? (await services.regions.create({ ...r, countries: [...r.countries] }))
     regionIds.set(r.currencyCode, region.id)
@@ -66,7 +60,7 @@ export async function seedDemoStore(services: PygmalionServices): Promise<SeedRe
   // The default region is what a first-time visitor is priced in.
   await services.stores.update(store.id, { defaultRegionId: regionIds.get('eur') })
 
-  for (const t of TAX) {
+  for (const t of catalog.tax) {
     const [existing] = await services.taxRegions.list({ countryCode: t.countryCode, limit: 1 })
     const taxRegion = existing ?? (await services.taxRegions.create({ countryCode: t.countryCode }))
     const rates = await services.taxRates.list({ taxRegionId: taxRegion.id, limit: 5 })
@@ -83,14 +77,14 @@ export async function seedDemoStore(services: PygmalionServices): Promise<SeedRe
 
   // --- Taxonomy --------------------------------------------------------------
   const collectionIds = new Map<string, string>()
-  for (const c of COLLECTIONS) {
+  for (const c of catalog.collections) {
     const [existing] = await services.collections.list({ q: c.title, limit: 1 })
     const row = existing ?? (await services.collections.create({ title: c.title, handle: c.handle }))
     collectionIds.set(c.handle, row.id)
   }
 
   const categoryIds = new Map<string, string>()
-  for (const c of CATEGORIES) {
+  for (const c of catalog.categories) {
     const [existing] = await services.categories.list({ q: c.name, limit: 1 })
     const row =
       existing ??
@@ -106,25 +100,25 @@ export async function seedDemoStore(services: PygmalionServices): Promise<SeedRe
 
   // --- Warehouse -------------------------------------------------------------
   const [existingLocation] = await services.inventory.locations.list({ limit: 1 })
-  const location = existingLocation ?? (await services.inventory.locations.create({ name: 'Entrepôt Nantes' }))
+  const location = existingLocation ?? (await services.inventory.locations.create({ name: catalog.locationName }))
   await services.stores.update(store.id, { defaultLocationId: location.id })
 
   // --- Catalogue -------------------------------------------------------------
-  for (const p of PRODUCTS) {
+  for (const p of catalog.products) {
     await seedProduct(services, p, { collectionIds, categoryIds, locationId: location.id })
   }
 
   // --- Shipping --------------------------------------------------------------
-  const shippingOptionCount = await seedShipping(services)
+  const shippingOptionCount = await seedShipping(services, catalog)
 
   // --- Promotions ------------------------------------------------------------
-  const promotionCount = await seedPromotions(services)
+  const promotionCount = await seedPromotions(services, catalog.promoCode)
 
   return {
-    products: PRODUCTS.length,
-    regions: REGIONS.length,
-    collections: COLLECTIONS.length,
-    categories: CATEGORIES.length,
+    products: catalog.products.length,
+    regions: catalog.regions.length,
+    collections: catalog.collections.length,
+    categories: catalog.categories.length,
     shippingOptions: shippingOptionCount,
     promotions: promotionCount,
   }
@@ -195,23 +189,23 @@ async function seedProduct(
 
 // --- Shipping: one zone covering both regions, priced in both currencies -----
 
-async function seedShipping(services: PygmalionServices): Promise<number> {
+async function seedShipping(services: PygmalionServices, catalog: DemoCatalog): Promise<number> {
   const profile = await services.shipping.profiles.ensureDefault()
   const [existingSet] = await services.shipping.fulfillmentSets.list({ limit: 1 })
-  const set = existingSet ?? (await services.shipping.fulfillmentSets.create({ name: 'Expéditions Maison Pygmalion' }))
+  const set = existingSet ?? (await services.shipping.fulfillmentSets.create({ name: catalog.fulfillmentSetName }))
 
   const zones = await services.shipping.serviceZones.list(set.id)
   const zone =
     zones[0] ??
     (await services.shipping.serviceZones.create(set.id, {
-      name: 'Europe & Amérique du Nord',
+      name: catalog.zoneName,
       // One zone, every country both regions ship to: a shipping option carries
       // a price per currency, so splitting per region would only duplicate rows.
-      geoZones: [...REGIONS.flatMap((r) => r.countries)].map((c) => ({ type: 'country' as const, countryCode: c.toLowerCase() })),
+      geoZones: catalog.regions.flatMap((r) => r.countries).map((c) => ({ type: 'country' as const, countryCode: c.toLowerCase() })),
     }))
 
   const existingOptions = await services.shipping.options.list({ serviceZoneId: zone.id, limit: 20 })
-  for (const opt of SHIPPING) {
+  for (const opt of catalog.shipping) {
     if (existingOptions.some((o) => o.name === opt.name)) continue
     const option = await services.shipping.options.create({
       name: opt.name,
@@ -226,12 +220,12 @@ async function seedShipping(services: PygmalionServices): Promise<number> {
       ],
     })
   }
-  return SHIPPING.length
+  return catalog.shipping.length
 }
 
 // --- Promotions: one automatic, one code -------------------------------------
 
-async function seedPromotions(services: PygmalionServices): Promise<number> {
+async function seedPromotions(services: PygmalionServices, promoCode: string): Promise<number> {
   const existing = await services.promotions.list({ limit: 50 })
   const has = (code: string | null, automatic = false) =>
     existing.some((p) => (automatic ? p.isAutomatic && !p.code : p.code === code))
@@ -248,9 +242,9 @@ async function seedPromotions(services: PygmalionServices): Promise<number> {
     })
   }
 
-  if (!has(PROMO_CODE)) {
+  if (!has(promoCode)) {
     await services.promotions.create({
-      code: PROMO_CODE,
+      code: promoCode,
       status: 'active',
       applicationMethod: { target: 'items', allocation: 'across', valueType: 'percentage', value: 10 },
     })

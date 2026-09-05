@@ -14,11 +14,10 @@ const props = defineProps<{ order: StoreOrder; guestEmail?: string; showReturn?:
 const emit = defineEmits<{ returned: [] }>()
 
 const client = usePygmalion()
+const { t, tf, one, money, formatDate } = useShopText()
 const currency = computed(() => props.order.currencyCode)
 const headline = computed(() => orderHeadline(props.order))
-const placedAt = computed(() =>
-  new Intl.DateTimeFormat('fr-FR', { dateStyle: 'long' }).format(new Date(props.order.createdAt)),
-)
+const placedAt = computed(() => formatDate(props.order.createdAt))
 const returnable = computed(() => props.order.items.filter((i) => i.returnableQuantity > 0))
 
 // Deliberately NOT awaited: the return reasons fill a select the shopper only
@@ -33,7 +32,7 @@ const { data: reasons } = useAsyncData('store:return-reasons', () => client.stor
 // "no selection, show the placeholder" and throws on an item that uses it.
 const NO_REASON = 'none'
 const reasonItems = computed(() => [
-  { value: NO_REASON, label: 'Ne pas préciser' },
+  { value: NO_REASON, label: t('orderReturnNoReason') },
   ...reasons.value.returnReasons.map((r) => ({ value: r.id, label: r.label })),
 ])
 
@@ -77,9 +76,9 @@ async function requestReturn() {
   <article>
     <header class="flex flex-wrap items-start justify-between gap-4 border-b border-default pb-6">
       <div>
-        <p class="text-sm text-muted">Commande du {{ placedAt }}</p>
+        <p class="text-sm text-muted">{{ tf('orderPlacedOn', { date: placedAt }) }}</p>
         <h2 class="shop-display mt-1 text-2xl text-highlighted" data-testid="order-number">
-          N° {{ order.displayId }}
+          {{ tf('orderNumber', { id: order.displayId }) }}
         </h2>
         <p class="sr-only" data-testid="order-id">{{ order.id }}</p>
       </div>
@@ -87,7 +86,7 @@ async function requestReturn() {
         :color="headline.tone === 'neutral' ? 'neutral' : headline.tone"
         variant="soft"
         size="lg"
-        :label="headline.label"
+        :label="t(headline.key)"
         data-testid="order-status"
       />
     </header>
@@ -105,20 +104,20 @@ async function requestReturn() {
         <div class="min-w-0 flex-1">
           <p class="font-semibold text-highlighted">{{ line.title }}</p>
           <p v-if="line.sku" class="mt-0.5 text-sm text-dimmed">{{ line.sku }}</p>
-          <p class="mt-1 text-sm text-muted">Quantité {{ line.quantity }}</p>
+          <p class="mt-1 text-sm text-muted">{{ tf('commonQuantity', { count: line.quantity }) }}</p>
           <p v-if="line.returnableQuantity > 0" class="mt-1 text-xs text-muted">
-            {{ line.returnableQuantity }} unité{{ line.returnableQuantity > 1 ? 's' : '' }} retournable{{ line.returnableQuantity > 1 ? 's' : '' }}
+            {{ tf(one(line.returnableQuantity) ? 'orderReturnableOne' : 'orderReturnableOther', { count: line.returnableQuantity }) }}
           </p>
         </div>
         <p class="shop-price text-highlighted" :data-amount="line.total">
-          {{ formatMoney(line.total, currency) }}
+          {{ money(line.total, currency) }}
         </p>
       </li>
     </ul>
 
     <div class="grid gap-8 border-t border-default pt-6 sm:grid-cols-2">
       <div v-if="order.shippingAddress">
-        <h3 class="text-sm font-semibold text-highlighted">Livraison</h3>
+        <h3 class="text-sm font-semibold text-highlighted">{{ t('commonShipping') }}</h3>
         <address class="mt-2 text-sm not-italic leading-relaxed text-muted">
           {{ order.shippingAddress.firstName }} {{ order.shippingAddress.lastName }}<br>
           {{ order.shippingAddress.address1 }}<br>
@@ -131,45 +130,45 @@ async function requestReturn() {
 
       <dl class="space-y-2 text-sm sm:justify-self-end sm:w-64">
         <div class="flex justify-between">
-          <dt class="text-muted">Sous-total</dt>
-          <dd class="shop-num text-toned">{{ formatMoney(order.itemsSubtotal, currency) }}</dd>
+          <dt class="text-muted">{{ t('commonSubtotal') }}</dt>
+          <dd class="shop-num text-toned">{{ money(order.itemsSubtotal, currency) }}</dd>
         </div>
         <div v-if="order.discountTotal > 0" class="flex justify-between">
-          <dt class="text-muted">Remise</dt>
-          <dd class="shop-num text-toned">−{{ formatMoney(order.discountTotal, currency) }}</dd>
+          <dt class="text-muted">{{ t('commonDiscount') }}</dt>
+          <dd class="shop-num text-toned">−{{ money(order.discountTotal, currency) }}</dd>
         </div>
         <div v-if="order.shippingTotal > 0" class="flex justify-between">
-          <dt class="text-muted">Livraison</dt>
-          <dd class="shop-num text-toned">{{ formatMoney(order.shippingTotal, currency) }}</dd>
+          <dt class="text-muted">{{ t('commonShipping') }}</dt>
+          <dd class="shop-num text-toned">{{ money(order.shippingTotal, currency) }}</dd>
         </div>
         <div v-if="order.taxTotal > 0" class="flex justify-between">
-          <dt class="text-muted">Taxes</dt>
-          <dd class="shop-num text-toned">{{ formatMoney(order.taxTotal, currency) }}</dd>
+          <dt class="text-muted">{{ t('commonTaxes') }}</dt>
+          <dd class="shop-num text-toned">{{ money(order.taxTotal, currency) }}</dd>
         </div>
         <div class="flex justify-between border-t border-default pt-2">
-          <dt class="font-semibold text-highlighted">Total</dt>
+          <dt class="font-semibold text-highlighted">{{ t('commonTotal') }}</dt>
           <dd class="shop-price text-lg text-highlighted" :data-amount="order.total" data-testid="order-total">
-            {{ formatMoney(order.total, currency) }}
+            {{ money(order.total, currency) }}
           </dd>
         </div>
-        <p class="pt-1 text-xs text-dimmed">{{ paymentLabel(order.paymentStatus).label }}</p>
+        <p class="pt-1 text-xs text-dimmed">{{ t(paymentLabel(order.paymentStatus).key) }}</p>
       </dl>
     </div>
 
-    <!-- Retour: proposé seulement là où l'API l'accepterait. -->
+    <!-- Returns: offered only where the API would accept one. -->
     <section v-if="showReturn && returnable.length" class="mt-8 border-t border-default pt-6">
       <p v-if="done" class="rounded-lg border border-success/30 bg-success/5 px-4 py-3 text-sm text-success" data-testid="return-done">
-        Votre demande de retour est enregistrée. Nous vous envoyons l'étiquette par e-mail.
+        {{ t('orderReturnDone') }}
       </p>
 
       <template v-else>
         <div class="flex flex-wrap items-center justify-between gap-3">
-          <h3 class="text-sm font-semibold text-highlighted">Un article ne convient pas ?</h3>
+          <h3 class="text-sm font-semibold text-highlighted">{{ t('orderReturnPrompt') }}</h3>
           <UButton
             size="sm"
             color="neutral"
             :variant="openForm ? 'ghost' : 'outline'"
-            :label="openForm ? 'Annuler' : 'Demander un retour'"
+            :label="t(openForm ? 'commonCancel' : 'orderRequestReturn')"
             data-testid="open-return"
             @click="openForm = !openForm"
           />
@@ -183,21 +182,21 @@ async function requestReturn() {
                 :model-value="picked[line.id] ?? 0"
                 :items="Array.from({ length: line.returnableQuantity + 1 }, (_, n) => ({ value: n, label: String(n) }))"
                 class="w-24"
-                :aria-label="`Quantité à retourner pour ${line.title}`"
+                :aria-label="tf('orderReturnQuantityFor', { title: line.title })"
                 :data-return-line="line.id"
                 @update:model-value="picked = { ...picked, [line.id]: Number($event) }"
               />
             </li>
           </ul>
 
-          <UFormField label="Motif" hint="facultatif">
+          <UFormField :label="t('orderReturnReason')" :hint="t('commonOptional')">
             <USelect
               v-model="reasonId"
               :items="reasonItems"
               class="w-full sm:max-w-xs"
             />
           </UFormField>
-          <UFormField label="Précisions" hint="facultatif">
+          <UFormField :label="t('orderReturnNote')" :hint="t('commonOptional')">
             <UTextarea v-model="note" :rows="2" class="w-full sm:max-w-md" />
           </UFormField>
 
@@ -207,7 +206,7 @@ async function requestReturn() {
             color="primary"
             :loading="busy"
             :disabled="pickedTotal === 0"
-            label="Envoyer la demande"
+            :label="t('orderSendReturn')"
             data-testid="submit-return"
           />
         </form>

@@ -1,14 +1,15 @@
 <script setup lang="ts">
 const emit = defineEmits<{ signOut: [] }>()
+const { t } = useShopText()
 
 // `/account` is the parent of every other route here, so it needs the EXACT
 // match or it highlights on all of them; the others match by prefix so an
-// order's detail page still lights up "Mes commandes".
+// order's detail page still lights up "My orders".
 const links = [
-  { to: '/account', label: 'Mon compte', icon: 'i-lucide-user', exact: true },
-  { to: '/account/orders', label: 'Mes commandes', icon: 'i-lucide-package', exact: false },
-  { to: '/account/addresses', label: 'Mes adresses', icon: 'i-lucide-map-pin', exact: false },
-]
+  { to: '/account', label: 'accountTitle', icon: 'i-lucide-user', exact: true },
+  { to: '/account/orders', label: 'accountOrders', icon: 'i-lucide-package', exact: false },
+  { to: '/account/addresses', label: 'accountAddresses', icon: 'i-lucide-map-pin', exact: false },
+] as const
 const ACTIVE = 'bg-muted text-highlighted'
 </script>
 
@@ -17,7 +18,7 @@ const ACTIVE = 'bg-muted text-highlighted'
        one line, and a scrolled-away active item is an item the visitor can't
        see they're on. Two rows, everything visible, no scroll affordance to
        invent. -->
-  <nav class="flex flex-row flex-wrap gap-1 sm:flex-col sm:flex-nowrap" aria-label="Mon compte">
+  <nav class="flex flex-row flex-wrap gap-1 sm:flex-col sm:flex-nowrap" :aria-label="t('accountTitle')">
     <NuxtLink
       v-for="l in links"
       :key="l.to"
@@ -27,7 +28,7 @@ const ACTIVE = 'bg-muted text-highlighted'
       :exact-active-class="ACTIVE"
     >
       <UIcon :name="l.icon" class="size-4" />
-      {{ l.label }}
+      {{ t(l.label) }}
     </NuxtLink>
     <button
       type="button"
@@ -36,7 +37,7 @@ const ACTIVE = 'bg-muted text-highlighted'
       @click="emit('signOut')"
     >
       <UIcon name="i-lucide-log-out" class="size-4" />
-      Se déconnecter
+      {{ t('accountSignOut') }}
     </button>
   </nav>
 </template>

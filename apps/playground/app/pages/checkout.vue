@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import type { CartAddressInput } from '@oumarbarry/pygmalion-core'
+import type { ShopTextKey } from '../utils/shop-text'
 
 /**
  * The checkout. `step` is DERIVED from the cart by `useCheckout`, never from a
@@ -23,8 +24,9 @@ const {
 } = useCheckout()
 const { customer, isAuthenticated, region, attachCustomer } = useShop()
 const { addresses, refreshAddresses } = useCustomer()
+const { t, tf, money } = useShopText()
 
-useSeoMeta({ title: 'Commande' })
+useSeoMeta({ title: () => t('checkoutTitle') })
 
 const busy = ref(false)
 const error = ref('')
@@ -86,13 +88,16 @@ watchEffect(() => {
  * `always-fail` — it exists to exercise the refusal path, and a shopper who
  * picks it should know that's what they're doing.
  */
-const PROVIDER_LABELS: Record<string, string> = {
-  manual: 'Paiement à réception (démo)',
-  stripe: 'Carte bancaire (Stripe)',
-  'always-fail': 'Paiement refusé (démo — pour tester le refus)',
+const PROVIDER_LABELS: Record<string, ShopTextKey> = {
+  manual: 'checkoutProviderManual',
+  stripe: 'checkoutProviderStripe',
+  'always-fail': 'checkoutProviderAlwaysFail',
 }
 const providerItems = computed(() =>
-  paymentProviders.value.map((p) => ({ value: p.id, label: PROVIDER_LABELS[p.id] ?? p.id })),
+  paymentProviders.value.map((p) => {
+    const key = PROVIDER_LABELS[p.id]
+    return { value: p.id, label: key ? t(key) : p.id }
+  }),
 )
 
 const submitAddress = (address: CartAddressInput) => run(() => setAddresses({ shippingAddress: address }))
@@ -104,7 +109,7 @@ const pay = () =>
     if (result.type === 'order') await navigateTo(`/order/${result.order.id}`)
     // `type: 'cart'` = authorization refused; the order was canceled and the
     // cart survives, so the shopper can pick another method and retry.
-    else throw new Error("Le paiement n'a pas abouti. Choisissez un autre moyen de paiement et réessayez.")
+    else throw new Error(t('checkoutPaymentFailed'))
   })
 
 const currency = computed(() => cart.value?.currencyCode)
@@ -113,13 +118,13 @@ const isEmpty = computed(() => !cart.value?.items.length && step.value !== 'done
 
 <template>
   <div class="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
-    <h1 class="shop-display text-3xl text-highlighted sm:text-4xl">Votre commande</h1>
+    <h1 class="shop-display text-3xl text-highlighted sm:text-4xl">{{ t('orderTitle') }}</h1>
 
     <div v-if="isEmpty" class="mt-8 rounded-xl border border-dashed border-default px-6 py-14 text-center">
       <UIcon name="i-lucide-shopping-bag" class="mx-auto size-8 text-dimmed" />
-      <p class="mt-4 font-semibold text-highlighted">Il n'y a rien à commander</p>
-      <p class="mt-1.5 text-sm text-muted">Ajoutez un objet au panier pour continuer.</p>
-      <UButton to="/products" class="mt-5" color="primary" label="Voir la boutique" />
+      <p class="mt-4 font-semibold text-highlighted">{{ t('checkoutEmptyTitle') }}</p>
+      <p class="mt-1.5 text-sm text-muted">{{ t('checkoutEmptyMessage') }}</p>
+      <UButton to="/products" class="mt-5" color="primary" :label="t('commonBrowseShop')" />
       <p class="sr-only" data-testid="step">{{ step }}</p>
     </div>
 
@@ -137,20 +142,20 @@ const isEmpty = computed(() => !cart.value?.items.length && step.value !== 'done
           {{ error }}
         </p>
 
-        <!-- 1. Coordonnées ------------------------------------------------- -->
+        <!-- 1. Contact --------------------------------------------------- -->
         <section v-if="step === 'email'" class="mt-8">
-          <h2 class="text-lg font-bold text-highlighted">Vos coordonnées</h2>
+          <h2 class="text-lg font-bold text-highlighted">{{ t('checkoutContactTitle') }}</h2>
           <p class="mt-1 text-sm text-muted">
-            Nous n'envoyons que la confirmation et le suivi.
+            {{ t('checkoutContactText') }}
             <template v-if="!isAuthenticated">
               <NuxtLink to="/account/login?redirect=/checkout" class="underline underline-offset-2 hover:text-highlighted">
-                Se connecter
+                {{ t('accountSignIn') }}
               </NuxtLink>
-              pour retrouver ses adresses.
+              {{ t('checkoutSignInHint') }}
             </template>
           </p>
           <form class="mt-5 max-w-sm space-y-4" @submit.prevent="run(() => setEmail(email))">
-            <UFormField label="Adresse e-mail" required>
+            <UFormField :label="t('commonEmail')" required>
               <UInput v-model="email" type="email" autocomplete="email" required class="w-full" data-testid="email" />
             </UFormField>
             <UButton
@@ -159,16 +164,16 @@ const isEmpty = computed(() => !cart.value?.items.length && step.value !== 'done
               color="primary"
               class="w-full sm:w-auto"
               :loading="busy"
-              label="Continuer"
+              :label="t('commonContinue')"
               data-testid="email-submit"
             />
           </form>
         </section>
 
-        <!-- 2. Adresse ------------------------------------------------------ -->
+        <!-- 2. Address --------------------------------------------------- -->
         <section v-else-if="step === 'address'" class="mt-8">
-          <h2 class="text-lg font-bold text-highlighted">Adresse de livraison</h2>
-          <p class="mt-1 text-sm text-muted">Commande pour {{ cart?.email }}</p>
+          <h2 class="text-lg font-bold text-highlighted">{{ t('checkoutAddressTitle') }}</h2>
+          <p class="mt-1 text-sm text-muted">{{ tf('checkoutOrderFor', { email: cart?.email ?? '' }) }}</p>
           <CheckoutAddressForm
             class="mt-5 max-w-lg"
             :saved="addresses"
@@ -178,15 +183,15 @@ const isEmpty = computed(() => !cart.value?.items.length && step.value !== 'done
           />
         </section>
 
-        <!-- 3. Livraison ---------------------------------------------------- -->
+        <!-- 3. Shipping -------------------------------------------------- -->
         <section v-else-if="step === 'shipping'" class="mt-8">
-          <h2 class="text-lg font-bold text-highlighted">Mode de livraison</h2>
+          <h2 class="text-lg font-bold text-highlighted">{{ t('checkoutShippingTitle') }}</h2>
           <AsyncState
             class="mt-5"
             :pending="busy && !shippingOptions.length"
             :empty="!busy && !shippingOptions.length"
-            empty-title="Aucune livraison possible ici"
-            empty-message="Nous ne desservons pas encore cette adresse. Modifiez-la pour continuer."
+            :empty-title="t('checkoutNoShippingTitle')"
+            :empty-message="t('checkoutNoShippingMessage')"
             empty-icon="i-lucide-truck"
             @retry="run(loadShippingOptions)"
           >
@@ -201,7 +206,7 @@ const isEmpty = computed(() => !cart.value?.items.length && step.value !== 'done
                 >
                   <span class="font-medium text-highlighted">{{ option.name }}</span>
                   <span class="shop-num font-semibold text-toned" :data-amount="option.amount">
-                    {{ formatMoney(option.amount, currency) }}
+                    {{ money(option.amount, currency) }}
                   </span>
                 </button>
               </li>
@@ -209,15 +214,15 @@ const isEmpty = computed(() => !cart.value?.items.length && step.value !== 'done
           </AsyncState>
         </section>
 
-        <!-- 4. Paiement ----------------------------------------------------- -->
+        <!-- 4. Payment --------------------------------------------------- -->
         <section v-else-if="step === 'payment'" class="mt-8">
-          <h2 class="text-lg font-bold text-highlighted">Paiement</h2>
+          <h2 class="text-lg font-bold text-highlighted">{{ t('checkoutStepPayment') }}</h2>
           <p class="mt-1 text-sm text-muted">
-            Livré à {{ cart?.shippingCity }} · {{ cart?.shippingMethods[0]?.name }}
+            {{ tf('checkoutShipTo', { city: cart?.shippingCity ?? '', method: cart?.shippingMethods[0]?.name ?? '' }) }}
           </p>
 
           <fieldset class="mt-5 max-w-lg space-y-3">
-            <legend class="sr-only">Moyen de paiement</legend>
+            <legend class="sr-only">{{ t('checkoutPaymentMethod') }}</legend>
             <label
               v-for="p in providerItems"
               :key="p.value"
@@ -230,8 +235,7 @@ const isEmpty = computed(() => !cart.value?.items.length && step.value !== 'done
           </fieldset>
 
           <p v-if="provider === 'stripe'" class="mt-4 max-w-lg text-sm text-muted">
-            Le paiement passe par Stripe. Le montant est seulement autorisé maintenant — il n'est débité qu'à
-            l'expédition.
+            {{ t('checkoutStripeNote') }}
           </p>
 
           <UButton
@@ -240,25 +244,25 @@ const isEmpty = computed(() => !cart.value?.items.length && step.value !== 'done
             color="primary"
             :loading="busy"
             :leading-icon="busy ? 'i-lucide-loader-circle' : undefined"
-            :label="`Payer ${formatMoney(cart?.total ?? 0, currency)}`"
+            :label="tf('checkoutPay', { amount: money(cart?.total ?? 0, currency) })"
             data-testid="pay"
             @click="pay()"
           />
           <p class="mt-3 max-w-lg text-xs text-dimmed">
-            En validant, vous acceptez que votre commande soit préparée et expédiée à l'adresse indiquée.
+            {{ t('checkoutConsent') }}
           </p>
         </section>
 
         <!-- The order exists: /order/:id is the confirmation. -->
         <section v-else class="mt-8">
-          <p class="text-muted">Commande enregistrée.</p>
-          <UButton v-if="order" :to="`/order/${order.id}`" class="mt-4" color="primary" label="Voir la confirmation" />
+          <p class="text-muted">{{ t('checkoutDone') }}</p>
+          <UButton v-if="order" :to="`/order/${order.id}`" class="mt-4" color="primary" :label="t('checkoutSeeConfirmation')" />
         </section>
       </div>
 
       <aside class="lg:sticky lg:top-24 lg:self-start">
         <div class="rounded-xl border border-default p-5">
-          <h2 class="text-sm font-semibold text-highlighted">Votre panier</h2>
+          <h2 class="text-sm font-semibold text-highlighted">{{ t('checkoutYourCart') }}</h2>
           <ul class="mt-4 space-y-3">
             <li v-for="line in cart?.items ?? []" :key="line.id" class="flex gap-3 text-sm">
               <img
@@ -273,10 +277,10 @@ const isEmpty = computed(() => !cart.value?.items.length && step.value !== 'done
                 <span class="block truncate font-medium text-highlighted">{{ line.title }}</span>
                 <span class="text-muted">× {{ line.quantity }}</span>
               </span>
-              <span class="shop-num text-toned">{{ formatMoney(line.total, currency) }}</span>
+              <span class="shop-num text-toned">{{ money(line.total, currency) }}</span>
             </li>
           </ul>
-          <!-- "calculée à l'étape suivante" is only true while livraison IS the
+          <!-- "calculated at the next step" is only true while shipping IS the
                next step; on the shipping step itself the price is on screen. -->
           <CartTotals
             class="mt-5 border-t border-default pt-5"
@@ -285,7 +289,7 @@ const isEmpty = computed(() => !cart.value?.items.length && step.value !== 'done
           />
         </div>
         <NuxtLink to="/cart" class="mt-4 block text-center text-sm text-muted hover:text-highlighted">
-          Modifier le panier
+          {{ t('checkoutEditCart') }}
         </NuxtLink>
       </aside>
     </div>

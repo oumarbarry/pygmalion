@@ -3,8 +3,9 @@
 // (the id) plus the server's httpOnly token, forwarded by SSR. The layout has
 // already refreshed it — this page renders the same shared state, in full.
 const { cart, itemCount, promoCodes, updateItem, removeItem, applyPromoCode, removePromoCode } = useShop()
+const { t, tf, money } = useShopText()
 
-useSeoMeta({ title: 'Panier' })
+useSeoMeta({ title: () => t('cartTitle') })
 
 const busy = ref(false)
 const code = ref('')
@@ -43,18 +44,18 @@ const lines = computed(() => cart.value?.items ?? [])
 <template>
   <div class="mx-auto max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
     <h1 class="shop-display text-3xl text-highlighted sm:text-4xl">
-      Panier <span v-if="itemCount" class="font-normal text-muted">({{ itemCount }})</span>
+      {{ t('cartTitle') }} <span v-if="itemCount" class="font-normal text-muted">({{ itemCount }})</span>
     </h1>
 
     <AsyncState
       class="mt-8"
       :empty="!lines.length"
-      empty-title="Votre panier est vide"
-      empty-message="Parcourez la boutique : tout ce que vous ajoutez vous attendra ici."
+      :empty-title="t('cartEmptyTitle')"
+      :empty-message="t('cartEmptyPageMessage')"
       empty-icon="i-lucide-shopping-bag"
     >
       <template #empty-action>
-        <UButton to="/products" class="mt-5" color="primary" label="Voir la boutique" />
+        <UButton to="/products" class="mt-5" color="primary" :label="t('commonBrowseShop')" />
       </template>
 
       <div class="grid gap-10 lg:grid-cols-[1fr_20rem] lg:gap-14">
@@ -79,13 +80,13 @@ const lines = computed(() => cart.value?.items ?? [])
                 {{ line.title }}
               </NuxtLink>
               <p v-if="line.sku" class="mt-0.5 text-sm text-dimmed">{{ line.sku }}</p>
-              <p class="shop-num mt-1 text-sm text-muted">{{ formatMoney(line.unitPrice, currency) }} l'unité</p>
+              <p class="shop-num mt-1 text-sm text-muted">{{ tf('cartUnitPrice', { price: money(line.unitPrice, currency) }) }}</p>
 
               <div class="mt-3 flex flex-wrap items-center gap-3">
                 <QuantityStepper
                   :quantity="line.quantity"
                   :disabled="busy"
-                  :label="`Quantité pour ${line.title}`"
+                  :label="tf('commonQuantityFor', { title: line.title })"
                   @update="run(() => updateItem(line.id, $event))"
                 />
                 <UButton
@@ -93,7 +94,7 @@ const lines = computed(() => cart.value?.items ?? [])
                   color="neutral"
                   variant="ghost"
                   icon="i-lucide-trash-2"
-                  label="Retirer"
+                  :label="t('commonRemove')"
                   :disabled="busy"
                   @click="run(() => removeItem(line.id))"
                 />
@@ -102,10 +103,10 @@ const lines = computed(() => cart.value?.items ?? [])
 
             <div class="text-right">
               <p class="shop-price text-highlighted" :data-amount="line.total">
-                {{ formatMoney(line.total, currency) }}
+                {{ money(line.total, currency) }}
               </p>
               <p v-if="line.discountTotal > 0" class="shop-num mt-1 text-sm text-primary">
-                −{{ formatMoney(line.discountTotal, currency) }}
+                −{{ money(line.discountTotal, currency) }}
               </p>
             </div>
           </li>
@@ -113,18 +114,18 @@ const lines = computed(() => cart.value?.items ?? [])
 
         <aside class="lg:sticky lg:top-24 lg:self-start">
           <div class="rounded-xl border border-default p-5">
-            <h2 class="text-sm font-semibold text-highlighted">Récapitulatif</h2>
+            <h2 class="text-sm font-semibold text-highlighted">{{ t('cartSummary') }}</h2>
 
             <form class="mt-4 flex gap-2" @submit.prevent="submitCode">
               <UInput
                 v-model="code"
-                placeholder="Code promo"
+                :placeholder="t('cartPromoCode')"
                 size="sm"
                 class="flex-1"
-                aria-label="Code promo"
+                :aria-label="t('cartPromoCode')"
                 data-testid="promo-input"
               />
-              <UButton type="submit" size="sm" color="neutral" variant="outline" label="Appliquer" :loading="busy" />
+              <UButton type="submit" size="sm" color="neutral" variant="outline" :label="t('cartApply')" :loading="busy" />
             </form>
             <p v-if="codeError" class="mt-2 text-xs text-error" role="alert" data-testid="promo-error">{{ codeError }}</p>
             <ul v-if="promoCodes.length" class="mt-2.5 flex flex-wrap gap-1.5">
@@ -135,7 +136,7 @@ const lines = computed(() => cart.value?.items ?? [])
                   variant="soft"
                   trailing-icon="i-lucide-x"
                   :label="c"
-                  :aria-label="`Retirer le code ${c}`"
+                  :aria-label="tf('cartRemoveCode', { code: c })"
                   data-testid="promo-chip"
                   @click="run(() => removePromoCode(c))"
                 />
@@ -144,10 +145,10 @@ const lines = computed(() => cart.value?.items ?? [])
 
             <CartTotals class="mt-5" :cart="cart" show-shipping-hint />
 
-            <UButton to="/checkout" block size="lg" color="primary" label="Commander" class="mt-5" data-testid="to-checkout" />
+            <UButton to="/checkout" block size="lg" color="primary" :label="t('cartOrder')" class="mt-5" data-testid="to-checkout" />
           </div>
           <NuxtLink to="/products" class="mt-4 block text-center text-sm text-muted hover:text-highlighted">
-            Continuer mes achats
+            {{ t('commonContinueShopping') }}
           </NuxtLink>
         </aside>
       </div>

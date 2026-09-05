@@ -1,3 +1,5 @@
+import type { ShopTextKey } from './shop-text'
+
 /**
  * Storefront-side helpers. Pure functions, no fetch — unit tested next door.
  *
@@ -26,11 +28,15 @@ function exponent(currency: string): number {
   }
 }
 
-export function formatMoney(amount: number | null | undefined, currency: string | null | undefined): string {
+export function formatMoney(
+  amount: number | null | undefined,
+  currency: string | null | undefined,
+  locale = 'en-US',
+): string {
   if (amount === null || amount === undefined) return '—'
   const code = (currency ?? 'eur').toUpperCase()
   try {
-    return new Intl.NumberFormat('fr-FR', { style: 'currency', currency: code }).format(amount / 10 ** exponent(code))
+    return new Intl.NumberFormat(locale, { style: 'currency', currency: code }).format(amount / 10 ** exponent(code))
   } catch {
     return `${(amount / 100).toFixed(2)} ${code}`
   }
@@ -44,55 +50,61 @@ export function priceFrom(variants: { calculatedPrice?: { calculatedAmount: numb
   return amounts.length ? Math.min(...amounts) : null
 }
 
-// --- Order status, in plain French -------------------------------------------
+// --- Order status, in a shopper's words ---------------------------------------
 // The admin has its own vocabulary (merchant-facing). A shopper reads a
 // different sentence about the same row: not "fulfillment_status: shipped" but
-// "expédiée". Tone is a tuple so a badge can colour itself.
+// "shipped". Each status maps to a `shop-text` key (the page renders it in the
+// shopper's language) and a tone, so a badge can colour itself.
+
 
 export type StatusTone = 'neutral' | 'info' | 'success' | 'warning' | 'error'
-
-const ORDER: Record<string, { label: string; tone: StatusTone }> = {
-  pending: { label: 'En cours de traitement', tone: 'info' },
-  completed: { label: 'Terminée', tone: 'success' },
-  canceled: { label: 'Annulée', tone: 'error' },
-  archived: { label: 'Archivée', tone: 'neutral' },
-  requires_action: { label: 'Action requise', tone: 'warning' },
+export interface StatusDisplay {
+  key: ShopTextKey
+  tone: StatusTone
 }
 
-const PAYMENT: Record<string, { label: string; tone: StatusTone }> = {
-  not_paid: { label: 'Paiement en attente', tone: 'warning' },
-  awaiting: { label: 'Paiement en attente', tone: 'warning' },
-  authorized: { label: 'Paiement autorisé', tone: 'info' },
-  partially_authorized: { label: 'Paiement partiel', tone: 'warning' },
-  captured: { label: 'Payée', tone: 'success' },
-  partially_captured: { label: 'Partiellement payée', tone: 'warning' },
-  refunded: { label: 'Remboursée', tone: 'neutral' },
-  partially_refunded: { label: 'Partiellement remboursée', tone: 'warning' },
-  canceled: { label: 'Paiement annulé', tone: 'error' },
+const ORDER: Record<string, StatusDisplay> = {
+  pending: { key: 'statusOrderPending', tone: 'info' },
+  completed: { key: 'statusOrderCompleted', tone: 'success' },
+  canceled: { key: 'statusOrderCanceled', tone: 'error' },
+  archived: { key: 'statusOrderArchived', tone: 'neutral' },
+  requires_action: { key: 'statusOrderRequiresAction', tone: 'warning' },
 }
 
-const SHIPMENT: Record<string, { label: string; tone: StatusTone }> = {
-  not_fulfilled: { label: 'En préparation', tone: 'info' },
-  partially_fulfilled: { label: 'En préparation', tone: 'info' },
-  fulfilled: { label: 'Prête à partir', tone: 'info' },
-  partially_shipped: { label: 'Partiellement expédiée', tone: 'info' },
-  shipped: { label: 'Expédiée', tone: 'success' },
-  partially_delivered: { label: 'Partiellement livrée', tone: 'success' },
-  delivered: { label: 'Livrée', tone: 'success' },
-  canceled: { label: 'Expédition annulée', tone: 'error' },
+const PAYMENT: Record<string, StatusDisplay> = {
+  not_paid: { key: 'statusPaymentAwaiting', tone: 'warning' },
+  awaiting: { key: 'statusPaymentAwaiting', tone: 'warning' },
+  authorized: { key: 'statusPaymentAuthorized', tone: 'info' },
+  partially_authorized: { key: 'statusPaymentPartiallyAuthorized', tone: 'warning' },
+  captured: { key: 'statusPaymentCaptured', tone: 'success' },
+  partially_captured: { key: 'statusPaymentPartiallyCaptured', tone: 'warning' },
+  refunded: { key: 'statusPaymentRefunded', tone: 'neutral' },
+  partially_refunded: { key: 'statusPaymentPartiallyRefunded', tone: 'warning' },
+  canceled: { key: 'statusPaymentCanceled', tone: 'error' },
 }
 
-const UNKNOWN = { label: 'Statut inconnu', tone: 'neutral' as StatusTone }
+const SHIPMENT: Record<string, StatusDisplay> = {
+  not_fulfilled: { key: 'statusShipmentPreparing', tone: 'info' },
+  partially_fulfilled: { key: 'statusShipmentPreparing', tone: 'info' },
+  fulfilled: { key: 'statusShipmentReady', tone: 'info' },
+  partially_shipped: { key: 'statusShipmentPartiallyShipped', tone: 'info' },
+  shipped: { key: 'statusShipmentShipped', tone: 'success' },
+  partially_delivered: { key: 'statusShipmentPartiallyDelivered', tone: 'success' },
+  delivered: { key: 'statusShipmentDelivered', tone: 'success' },
+  canceled: { key: 'statusShipmentCanceled', tone: 'error' },
+}
 
-export const orderLabel = (s: string) => ORDER[s] ?? UNKNOWN
-export const paymentLabel = (s: string) => PAYMENT[s] ?? UNKNOWN
-export const shipmentLabel = (s: string) => SHIPMENT[s] ?? UNKNOWN
+const UNKNOWN: StatusDisplay = { key: 'statusUnknown', tone: 'neutral' }
+
+export const orderLabel = (s: string): StatusDisplay => ORDER[s] ?? UNKNOWN
+export const paymentLabel = (s: string): StatusDisplay => PAYMENT[s] ?? UNKNOWN
+export const shipmentLabel = (s: string): StatusDisplay => SHIPMENT[s] ?? UNKNOWN
 
 /**
  * The one line a customer actually wants on an order card: where the parcel
  * is, unless something more urgent (cancelled, unpaid) outranks it.
  */
-export function orderHeadline(order: { status: string; paymentStatus: string; fulfillmentStatus?: string }) {
+export function orderHeadline(order: { status: string; paymentStatus: string; fulfillmentStatus?: string }): StatusDisplay {
   if (order.status === 'canceled' || order.status === 'archived') return orderLabel(order.status)
   if (order.paymentStatus === 'not_paid' || order.paymentStatus === 'awaiting') return paymentLabel(order.paymentStatus)
   return shipmentLabel(order.fulfillmentStatus ?? 'not_fulfilled')
@@ -101,10 +113,10 @@ export function orderHeadline(order: { status: string; paymentStatus: string; fu
 /**
  * Which variant a set of chosen option values points at.
  *
- * The picker is driven by the product's OPTIONS (two selects, "Bleu nuit" /
- * "Grande"), and the cart needs a variant id. A variant carries exactly one
- * value per option, so the match is a set comparison — `null` while the
- * shopper hasn't chosen everything yet, which is what disables "Ajouter".
+ * The picker is driven by the product's OPTIONS (two selects, "Midnight blue" /
+ * "Large"), and the cart needs a variant id. A variant carries exactly one
+ * value per option, so the match is a set comparison: `null` while the
+ * shopper hasn't chosen everything yet, which is what disables "Add to cart".
  */
 export function variantForOptions<V extends { optionValueIds: string[] }>(
   variants: V[],
@@ -120,11 +132,11 @@ export function variantForOptions<V extends { optionValueIds: string[] }>(
  * A 404 is not a failure, it's an answer: the thing isn't there.
  *
  * `AsyncState` renders `error` before `empty`, so a page that hands it a 404
- * shows "Ça n'a pas fonctionné" plus the server's own English message
- * ("Product not found") and a Réessayer button that can only fail again — a
- * dead end, in the wrong language (§S7). Pages that can legitimately 404 route
- * the 404 to their `empty` state instead, which already says it in French and
- * offers the way out.
+ * shows the generic "something went wrong" text plus the server's own message
+ * ("Product not found") and a retry button that can only fail again: a dead
+ * end. Pages that can legitimately 404 route the 404 to their `empty` state
+ * instead, which already says it in the shopper's language and offers the way
+ * out.
  */
 export function isNotFound(error: unknown): boolean {
   return typeof error === 'object' && error !== null && (error as { statusCode?: number }).statusCode === 404

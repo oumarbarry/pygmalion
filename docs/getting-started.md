@@ -34,8 +34,8 @@ The console tells you what was created:
 ```
 
 Open <http://localhost:3648>: the demo shop "Maison Pygmalion" is already
-stocked. It is the playground; the next sections build **your** product
-inside it.
+stocked, in English (start with `DEMO_LOCALE=fr` for a French catalog). It is
+the playground; the next sections build **your** product inside it.
 
 > To start from an empty database: stop the server, run
 > `rm -rf apps/playground/.data`, start again. The seed is idempotent block by

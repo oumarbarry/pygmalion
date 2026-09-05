@@ -3,6 +3,7 @@ definePageMeta({ layout: 'account', middleware: 'customer' })
 
 const client = usePygmalion()
 const route = useRoute()
+const { t, tf } = useShopText()
 const id = computed(() => String(route.params.id))
 
 // No `?email=`: the session is the proof of ownership here.
@@ -12,14 +13,14 @@ const { data, pending, error, refresh } = await useAsyncData(
   { watch: [id] },
 )
 
-useSeoMeta({ title: () => (data.value ? `Commande n° ${data.value.order.displayId}` : 'Commande') })
+useSeoMeta({ title: () => (data.value ? tf('orderNumberTitle', { id: data.value.order.displayId }) : t('orderFallbackTitle')) })
 </script>
 
 <template>
   <section>
     <NuxtLink to="/account/orders" class="inline-flex items-center gap-1.5 text-sm text-muted hover:text-highlighted">
       <UIcon name="i-lucide-arrow-left" class="size-4" />
-      Mes commandes
+      {{ t('accountOrders') }}
     </NuxtLink>
 
     <AsyncState
@@ -27,8 +28,8 @@ useSeoMeta({ title: () => (data.value ? `Commande n° ${data.value.order.display
       :pending="pending"
       :error="isNotFound(error) ? null : error"
       :empty="!data"
-      empty-title="Commande introuvable"
-      empty-message="Elle a peut-être été passée avec une autre adresse e-mail."
+      :empty-title="t('orderNotFoundTitle')"
+      :empty-message="t('orderNotFoundAccountMessage')"
       @retry="refresh()"
     >
       <OrderView v-if="data" :order="data.order" show-return @returned="refresh()" />

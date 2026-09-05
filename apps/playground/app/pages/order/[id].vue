@@ -10,6 +10,7 @@
 const client = usePygmalion()
 const route = useRoute()
 const { isAuthenticated } = useShop()
+const { t, tf } = useShopText()
 
 const id = computed(() => String(route.params.id))
 const email = computed(() => (route.query.email ? String(route.query.email) : undefined))
@@ -25,38 +26,38 @@ const { data, pending, error, refresh } = await useAsyncData(
 )
 
 const justPlaced = computed(() => placed.value?.id === id.value)
-useSeoMeta({ title: () => (data.value ? `Commande n° ${data.value.order.displayId}` : 'Commande') })
+useSeoMeta({ title: () => (data.value ? tf('orderNumberTitle', { id: data.value.order.displayId }) : t('orderFallbackTitle')) })
 </script>
 
 <template>
   <div class="mx-auto max-w-3xl px-4 py-10 sm:px-6 sm:py-14">
     <div v-if="justPlaced" class="mb-10 rounded-xl border border-primary/30 bg-primary/5 px-6 py-8 text-center">
       <UIcon name="i-lucide-circle-check" class="mx-auto size-9 text-primary" />
-      <h1 class="shop-display mt-4 text-2xl text-highlighted sm:text-3xl">Merci, c'est commandé.</h1>
+      <h1 class="shop-display mt-4 text-2xl text-highlighted sm:text-3xl">{{ t('orderThanks') }}</h1>
       <p class="mt-2 text-muted">
-        Un e-mail de confirmation part vers {{ data?.order.email }}. Nous préparons votre colis.
+        {{ tf('orderConfirmationSent', { email: data?.order.email ?? '' }) }}
       </p>
     </div>
-    <h1 v-else class="shop-display mb-8 text-3xl text-highlighted sm:text-4xl">Votre commande</h1>
+    <h1 v-else class="shop-display mb-8 text-3xl text-highlighted sm:text-4xl">{{ t('orderTitle') }}</h1>
 
     <AsyncState
       :pending="pending"
       :error="isNotFound(error) ? null : error"
       :empty="!data"
-      empty-title="Commande introuvable"
-      empty-message="Vérifiez le numéro et l'adresse e-mail utilisée lors de l'achat."
+      :empty-title="t('orderNotFoundTitle')"
+      :empty-message="t('orderNotFoundGuestMessage')"
       @retry="refresh()"
     >
       <template #empty-action>
-        <UButton to="/order" class="mt-5" color="neutral" variant="outline" label="Retrouver ma commande" />
+        <UButton to="/order" class="mt-5" color="neutral" variant="outline" :label="t('orderFindMine')" />
       </template>
 
       <OrderView v-if="data" :order="data.order" :guest-email="lookupEmail" show-return @returned="refresh()" />
     </AsyncState>
 
     <div class="mt-10 flex flex-wrap gap-3 border-t border-default pt-6">
-      <UButton to="/products" color="neutral" variant="outline" label="Continuer mes achats" />
-      <UButton v-if="isAuthenticated" to="/account/orders" color="neutral" variant="ghost" label="Toutes mes commandes" />
+      <UButton to="/products" color="neutral" variant="outline" :label="t('commonContinueShopping')" />
+      <UButton v-if="isAuthenticated" to="/account/orders" color="neutral" variant="ghost" :label="t('orderAllMine')" />
     </div>
   </div>
 </template>

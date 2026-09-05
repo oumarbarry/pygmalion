@@ -1,6 +1,7 @@
 <script setup lang="ts">
+const { locale } = useShopText()
 useHead({
-  htmlAttrs: { lang: 'fr' },
+  htmlAttrs: { lang: locale },
   titleTemplate: (title) => (title ? `${title} — Maison Pygmalion` : 'Maison Pygmalion'),
 })
 </script>

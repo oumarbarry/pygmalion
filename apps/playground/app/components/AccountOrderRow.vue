@@ -7,12 +7,13 @@ import type { Order } from '@oumarbarry/pygmalion-core'
  * payment/order status; the detail page has the full picture.
  */
 const props = defineProps<{ order: Order & { paymentStatus?: string } }>()
+const { t, tf, money, tag } = useShopText()
 
 const headline = computed(() =>
   orderHeadline({ status: props.order.status, paymentStatus: props.order.paymentStatus ?? 'captured' }),
 )
 const placedAt = computed(() =>
-  new Intl.DateTimeFormat('fr-FR', { dateStyle: 'medium' }).format(new Date(props.order.createdAt)),
+  new Intl.DateTimeFormat(tag.value, { dateStyle: 'medium' }).format(new Date(props.order.createdAt)),
 )
 </script>
 
@@ -23,11 +24,11 @@ const placedAt = computed(() =>
       class="flex flex-wrap items-center gap-x-4 gap-y-2 py-4 transition-colors hover:bg-muted/40"
       data-testid="order-row"
     >
-      <span class="font-semibold text-highlighted">N° {{ order.displayId }}</span>
+      <span class="font-semibold text-highlighted">{{ tf('orderNumber', { id: order.displayId }) }}</span>
       <span class="text-sm text-muted">{{ placedAt }}</span>
-      <UBadge :color="headline.tone === 'neutral' ? 'neutral' : headline.tone" variant="soft" :label="headline.label" />
+      <UBadge :color="headline.tone === 'neutral' ? 'neutral' : headline.tone" variant="soft" :label="t(headline.key)" />
       <span class="shop-price ml-auto text-highlighted" :data-amount="order.total">
-        {{ formatMoney(order.total, order.currencyCode) }}
+        {{ money(order.total, order.currencyCode) }}
       </span>
       <UIcon name="i-lucide-chevron-right" class="size-4 text-dimmed" />
     </NuxtLink>

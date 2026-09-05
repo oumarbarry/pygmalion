@@ -7,6 +7,7 @@ const props = withDefaults(defineProps<{ quantity: number; disabled?: boolean; m
   max: 99,
 })
 const emit = defineEmits<{ update: [quantity: number] }>()
+const { t } = useShopText()
 
 const step = (delta: number) => emit('update', Math.min(props.max, Math.max(1, props.quantity + delta)))
 </script>
@@ -17,7 +18,7 @@ const step = (delta: number) => emit('update', Math.min(props.max, Math.max(1, p
       type="button"
       class="flex size-11 items-center justify-center rounded-l-lg text-muted transition-colors hover:bg-muted hover:text-highlighted disabled:opacity-40"
       :disabled="disabled || quantity <= 1"
-      aria-label="Diminuer la quantité"
+      :aria-label="t('commonDecrease')"
       @click="step(-1)"
     >
       <UIcon name="i-lucide-minus" class="size-4" />
@@ -27,7 +28,7 @@ const step = (delta: number) => emit('update', Math.min(props.max, Math.max(1, p
       type="button"
       class="flex size-11 items-center justify-center rounded-r-lg text-muted transition-colors hover:bg-muted hover:text-highlighted disabled:opacity-40"
       :disabled="disabled || quantity >= max"
-      aria-label="Augmenter la quantité"
+      :aria-label="t('commonIncrease')"
       @click="step(1)"
     >
       <UIcon name="i-lucide-plus" class="size-4" />

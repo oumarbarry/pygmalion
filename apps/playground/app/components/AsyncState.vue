@@ -17,21 +17,21 @@ withDefaults(
   }>(),
   {
     skeleton: 0,
-    emptyTitle: 'Rien à afficher',
     emptyMessage: '',
     emptyIcon: 'i-lucide-package-open',
   },
 )
 
 const emit = defineEmits<{ retry: [] }>()
+const { t } = useShopText()
 
 const message = (error: unknown) =>
-  error instanceof Error ? error.message : typeof error === 'string' ? error : 'Une erreur est survenue.'
+  error instanceof Error ? error.message : typeof error === 'string' ? error : t('commonErrorMessage')
 </script>
 
 <template>
   <div v-if="pending" data-testid="state-loading" role="status" aria-live="polite">
-    <span class="sr-only">Chargement…</span>
+    <span class="sr-only">{{ t('commonLoading') }}</span>
     <div v-if="skeleton" class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
       <div v-for="i in skeleton" :key="i" class="animate-pulse">
         <div class="aspect-4/5 w-full rounded-xl bg-elevated" />
@@ -41,7 +41,7 @@ const message = (error: unknown) =>
     </div>
     <div v-else class="flex items-center gap-3 py-10 text-muted">
       <UIcon name="i-lucide-loader-circle" class="size-5 animate-spin" />
-      <span class="text-sm">Chargement…</span>
+      <span class="text-sm">{{ t('commonLoading') }}</span>
     </div>
   </div>
 
@@ -53,15 +53,15 @@ const message = (error: unknown) =>
   >
     <p class="flex items-center gap-2 font-semibold text-highlighted">
       <UIcon name="i-lucide-triangle-alert" class="size-5 text-error" />
-      Ça n'a pas fonctionné
+      {{ t('commonErrorTitle') }}
     </p>
     <p class="mt-1.5 text-sm text-muted">{{ message(error) }}</p>
-    <UButton class="mt-4" size="sm" color="neutral" variant="outline" label="Réessayer" @click="emit('retry')" />
+    <UButton class="mt-4" size="sm" color="neutral" variant="outline" :label="t('commonRetry')" @click="emit('retry')" />
   </div>
 
   <div v-else-if="empty" data-testid="state-empty" class="rounded-xl border border-dashed border-default px-6 py-14 text-center">
     <UIcon :name="emptyIcon" class="mx-auto size-8 text-dimmed" />
-    <p class="mt-4 font-semibold text-highlighted">{{ emptyTitle }}</p>
+    <p class="mt-4 font-semibold text-highlighted">{{ emptyTitle ?? t('commonEmptyTitle') }}</p>
     <p v-if="emptyMessage" class="mx-auto mt-1.5 max-w-sm text-sm text-muted">{{ emptyMessage }}</p>
     <slot name="empty-action" />
   </div>

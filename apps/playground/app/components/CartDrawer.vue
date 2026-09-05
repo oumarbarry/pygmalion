@@ -23,6 +23,7 @@ const emit = defineEmits<{
   removeCode: [code: string]
 }>()
 
+const { t, tf, money } = useShopText()
 const dialog = useTemplateRef<HTMLDialogElement>('dialog')
 const code = ref('')
 const codeError = ref('')
@@ -57,25 +58,25 @@ defineExpose({ setCodeError: (m: string) => (codeError.value = m) })
   <dialog
     ref="dialog"
     class="shop-drawer bg-default text-default"
-    aria-label="Panier"
+    :aria-label="t('cartTitle')"
     @close="emit('close')"
     @cancel.prevent="emit('close')"
   >
     <div class="flex h-full flex-col">
       <div class="flex items-center justify-between border-b border-default px-5 py-4">
         <h2 class="text-base font-bold text-highlighted">
-          Panier <span v-if="lines.length" class="font-normal text-muted">({{ lines.length }})</span>
+          {{ t('cartTitle') }} <span v-if="lines.length" class="font-normal text-muted">({{ lines.length }})</span>
         </h2>
-        <UButton color="neutral" variant="ghost" square icon="i-lucide-x" aria-label="Fermer le panier" @click="emit('close')" />
+        <UButton color="neutral" variant="ghost" square icon="i-lucide-x" :aria-label="t('cartClose')" @click="emit('close')" />
       </div>
 
       <div v-if="isEmpty" class="flex flex-1 flex-col items-center justify-center gap-4 px-8 text-center">
         <UIcon name="i-lucide-shopping-bag" class="size-9 text-dimmed" />
         <div>
-          <p class="font-semibold text-highlighted">Votre panier est vide</p>
-          <p class="mt-1 text-sm text-muted">Ajoutez-y un objet et il vous attendra ici.</p>
+          <p class="font-semibold text-highlighted">{{ t('cartEmptyTitle') }}</p>
+          <p class="mt-1 text-sm text-muted">{{ t('cartEmptyDrawerMessage') }}</p>
         </div>
-        <UButton to="/products" label="Voir la boutique" color="primary" @click="emit('close')" />
+        <UButton to="/products" :label="t('commonBrowseShop')" color="primary" @click="emit('close')" />
       </div>
 
       <template v-else>
@@ -91,26 +92,26 @@ defineExpose({ setCodeError: (m: string) => (codeError.value = m) })
             >
             <div class="min-w-0 flex-1">
               <p class="truncate text-sm font-semibold text-highlighted">{{ line.title }}</p>
-              <p class="shop-num mt-0.5 text-sm text-muted">{{ formatMoney(line.unitPrice, currency) }}</p>
+              <p class="shop-num mt-0.5 text-sm text-muted">{{ money(line.unitPrice, currency) }}</p>
 
               <div class="mt-2.5 flex items-center gap-2">
                 <QuantityStepper
                   :quantity="line.quantity"
                   :disabled="busy"
-                  :label="`Quantité pour ${line.title}`"
+                  :label="tf('commonQuantityFor', { title: line.title })"
                   @update="emit('updateQuantity', line.id, $event)"
                 />
                 <UButton
                   size="xs"
                   color="neutral"
                   variant="ghost"
-                  label="Retirer"
+                  :label="t('commonRemove')"
                   :disabled="busy"
                   @click="emit('remove', line.id)"
                 />
               </div>
             </div>
-            <p class="shop-price text-sm text-highlighted">{{ formatMoney(line.total, currency) }}</p>
+            <p class="shop-price text-sm text-highlighted">{{ money(line.total, currency) }}</p>
           </li>
         </ul>
 
@@ -118,13 +119,13 @@ defineExpose({ setCodeError: (m: string) => (codeError.value = m) })
           <form class="flex gap-2" @submit.prevent="submitCode">
             <UInput
               v-model="code"
-              placeholder="Code promo"
+              :placeholder="t('cartPromoCode')"
               size="sm"
               class="flex-1"
-              aria-label="Code promo"
+              :aria-label="t('cartPromoCode')"
               data-testid="promo-input"
             />
-            <UButton type="submit" size="sm" color="neutral" variant="outline" label="Appliquer" :loading="busy" />
+            <UButton type="submit" size="sm" color="neutral" variant="outline" :label="t('cartApply')" :loading="busy" />
           </form>
           <p v-if="codeError" class="mt-2 text-xs text-error" role="alert" data-testid="promo-error">{{ codeError }}</p>
           <ul v-if="promoCodes.length" class="mt-2.5 flex flex-wrap gap-1.5">
@@ -135,7 +136,7 @@ defineExpose({ setCodeError: (m: string) => (codeError.value = m) })
                 variant="soft"
                 trailing-icon="i-lucide-x"
                 :label="c"
-                :aria-label="`Retirer le code ${c}`"
+                :aria-label="tf('cartRemoveCode', { code: c })"
                 data-testid="promo-chip"
                 @click="emit('removeCode', c)"
               />
@@ -149,12 +150,12 @@ defineExpose({ setCodeError: (m: string) => (codeError.value = m) })
             block
             size="lg"
             color="primary"
-            label="Passer commande"
+            :label="t('cartCheckout')"
             class="mt-4"
             data-testid="drawer-checkout"
             @click="emit('close')"
           />
-          <p class="mt-2 text-center text-xs text-dimmed">Livraison et taxes calculées à l'étape suivante.</p>
+          <p class="mt-2 text-center text-xs text-dimmed">{{ t('cartShippingNote') }}</p>
         </div>
       </template>
     </div>

@@ -3,13 +3,18 @@ import { formatMoney, orderHeadline, priceFrom, variantForOptions } from './stor
 
 describe('formatMoney', () => {
   it('divides by the currency exponent, never by a hardcoded 100', () => {
-    expect(formatMoney(5900, 'eur')).toMatch(/59,00/)
-    expect(formatMoney(5900, 'usd')).toMatch(/59,00/)
+    expect(formatMoney(5900, 'eur')).toMatch(/59\.00/)
+    expect(formatMoney(5900, 'usd')).toMatch(/59\.00/)
     // 0-decimal currency: 5900 JPY is 5900 yen, not 59.
-    expect(formatMoney(5900, 'jpy').replace(/\s/g, '')).toMatch(/5900/)
+    expect(formatMoney(5900, 'jpy').replace(/[\s,]/g, '')).toMatch(/5900/)
   })
 
-  it('is total about a missing amount instead of printing 0,00', () => {
+  it('follows the locale it is given, English by default', () => {
+    expect(formatMoney(5900, 'eur', 'fr-FR')).toMatch(/59,00/)
+    expect(formatMoney(5900, 'eur', 'en-US')).toMatch(/59\.00/)
+  })
+
+  it('is total about a missing amount instead of printing 0.00', () => {
     expect(formatMoney(null, 'eur')).toBe('—')
     expect(formatMoney(undefined, 'eur')).toBe('—')
   })
@@ -65,16 +70,16 @@ describe('variantForOptions', () => {
 
 describe('orderHeadline', () => {
   it('leads with the parcel once the money is settled', () => {
-    expect(orderHeadline({ status: 'pending', paymentStatus: 'captured', fulfillmentStatus: 'shipped' }).label).toBe('Expédiée')
-    expect(orderHeadline({ status: 'pending', paymentStatus: 'authorized', fulfillmentStatus: 'delivered' }).label).toBe('Livrée')
+    expect(orderHeadline({ status: 'pending', paymentStatus: 'captured', fulfillmentStatus: 'shipped' }).key).toBe('statusShipmentShipped')
+    expect(orderHeadline({ status: 'pending', paymentStatus: 'authorized', fulfillmentStatus: 'delivered' }).key).toBe('statusShipmentDelivered')
   })
 
   it('an unpaid or cancelled order outranks where the parcel is', () => {
-    expect(orderHeadline({ status: 'canceled', paymentStatus: 'captured', fulfillmentStatus: 'shipped' }).label).toBe('Annulée')
+    expect(orderHeadline({ status: 'canceled', paymentStatus: 'captured', fulfillmentStatus: 'shipped' }).key).toBe('statusOrderCanceled')
     expect(orderHeadline({ status: 'pending', paymentStatus: 'not_paid', fulfillmentStatus: 'shipped' }).tone).toBe('warning')
   })
 
-  it('falls back to "en préparation" when no shipment status is known', () => {
-    expect(orderHeadline({ status: 'pending', paymentStatus: 'captured' }).label).toBe('En préparation')
+  it('falls back to "being prepared" when no shipment status is known', () => {
+    expect(orderHeadline({ status: 'pending', paymentStatus: 'captured' }).key).toBe('statusShipmentPreparing')
   })
 })

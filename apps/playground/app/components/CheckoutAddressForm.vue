@@ -15,8 +15,9 @@ const props = withDefaults(
     busy?: boolean
     submitLabel?: string
   }>(),
-  { saved: () => [], countries: () => [], submitLabel: 'Continuer' },
+  { saved: () => [], countries: () => [] },
 )
+const { t } = useShopText()
 
 const emit = defineEmits<{ submit: [address: CartAddressInput] }>()
 
@@ -42,7 +43,7 @@ watchEffect(() => {
 const savedItems = computed(() =>
   props.saved.map((a) => ({
     value: a.id,
-    label: [a.addressName, a.address1, a.city].filter(Boolean).join(' · ') || 'Adresse enregistrée',
+    label: [a.addressName, a.address1, a.city].filter(Boolean).join(' · ') || t('checkoutSavedAddress'),
   })),
 )
 
@@ -64,45 +65,45 @@ function useSaved(id: string) {
 
 <template>
   <form class="space-y-4" @submit.prevent="emit('submit', { ...form })">
-    <UFormField v-if="savedItems.length" label="Mes adresses enregistrées">
+    <UFormField v-if="savedItems.length" :label="t('checkoutSavedAddresses')">
       <USelect
         :items="savedItems"
-        placeholder="Utiliser une adresse enregistrée"
+        :placeholder="t('checkoutUseSaved')"
         class="w-full"
         @update:model-value="useSaved(String($event))"
       />
     </UFormField>
 
     <div class="grid gap-4 sm:grid-cols-2">
-      <UFormField label="Prénom" required>
+      <UFormField :label="t('commonFirstName')" required>
         <UInput v-model="form.firstName" autocomplete="given-name" required class="w-full" />
       </UFormField>
-      <UFormField label="Nom" required>
+      <UFormField :label="t('commonLastName')" required>
         <UInput v-model="form.lastName" autocomplete="family-name" required class="w-full" />
       </UFormField>
     </div>
 
-    <UFormField label="Adresse" required>
+    <UFormField :label="t('commonAddress')" required>
       <UInput v-model="form.address1" autocomplete="address-line1" required class="w-full" data-testid="address1" />
     </UFormField>
-    <UFormField label="Complément" hint="facultatif">
+    <UFormField :label="t('commonAddressLine2')" :hint="t('commonOptional')">
       <UInput v-model="form.address2" autocomplete="address-line2" class="w-full" />
     </UFormField>
 
     <div class="grid gap-4 sm:grid-cols-[10rem_1fr]">
-      <UFormField label="Code postal" required>
+      <UFormField :label="t('commonPostalCode')" required>
         <UInput v-model="form.postalCode" autocomplete="postal-code" required class="w-full" />
       </UFormField>
-      <UFormField label="Ville" required>
+      <UFormField :label="t('commonCity')" required>
         <UInput v-model="form.city" autocomplete="address-level2" required class="w-full" data-testid="city" />
       </UFormField>
     </div>
 
-    <UFormField label="Pays" required>
+    <UFormField :label="t('commonCountry')" required>
       <USelect v-model="form.countryCode" :items="countryItems" class="w-full" data-testid="country" />
     </UFormField>
 
-    <UFormField label="Téléphone" hint="pour la livraison">
+    <UFormField :label="t('commonPhone')" :hint="t('checkoutPhoneHint')">
       <UInput v-model="form.phone" type="tel" autocomplete="tel" class="w-full" />
     </UFormField>
 
@@ -112,7 +113,7 @@ function useSaved(id: string) {
       color="primary"
       class="w-full sm:w-auto"
       :loading="busy"
-      :label="submitLabel"
+      :label="submitLabel ?? t('commonContinue')"
       data-testid="address-submit"
     />
   </form>

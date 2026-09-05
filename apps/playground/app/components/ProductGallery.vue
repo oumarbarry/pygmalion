@@ -2,6 +2,7 @@
 import type { ProductImage } from '@oumarbarry/pygmalion-core'
 
 const props = defineProps<{ images: ProductImage[]; fallback: string | null; title: string }>()
+const { t, tf } = useShopText()
 
 const sources = computed(() =>
   props.images.length ? props.images.map((i) => i.url) : props.fallback ? [props.fallback] : [],
@@ -24,13 +25,13 @@ watch(sources, () => (active.value = 0))
       >
     </div>
 
-    <ul v-if="sources.length > 1" class="flex gap-3 sm:flex-col" aria-label="Photos du produit">
+    <ul v-if="sources.length > 1" class="flex gap-3 sm:flex-col" :aria-label="t('productPhotos')">
       <li v-for="(src, i) in sources" :key="src">
         <button
           type="button"
           class="shop-media size-16 overflow-hidden rounded-lg ring-offset-2 ring-offset-default transition-shadow sm:size-20"
           :class="i === active ? 'ring-2 ring-primary' : 'ring-1 ring-default hover:ring-accented'"
-          :aria-label="`Photo ${i + 1} sur ${sources.length}`"
+          :aria-label="tf('productPhotoN', { n: i + 1, total: sources.length })"
           :aria-current="i === active"
           @click="active = i"
         >

@@ -3,8 +3,9 @@ const client = usePygmalion()
 const route = useRoute()
 const router = useRouter()
 const { regionId, currencyCode, collections, categories } = useShop()
+const { t, tf, one } = useShopText()
 
-useSeoMeta({ title: 'La boutique', description: 'Tous les objets Maison Pygmalion.' })
+useSeoMeta({ title: () => t('productShopTitle'), description: () => t('productShopDescription') })
 
 /**
  * Filters live in the URL, not in local state: a filtered listing is a page
@@ -45,11 +46,11 @@ const products = computed(() => data.value?.products ?? [])
 // selection, show the placeholder" and throws on an item that uses it.
 const ALL = 'all'
 const collectionItems = computed(() => [
-  { value: ALL, label: 'Toutes les collections' },
+  { value: ALL, label: t('productAllCollections') },
   ...collections.value.map((c) => ({ value: c.id, label: c.title })),
 ])
 const categoryItems = computed(() => [
-  { value: ALL, label: 'Tous les rayons' },
+  { value: ALL, label: t('productAllCategories') },
   ...categories.value.map((c) => ({ value: c.id, label: c.name })),
 ])
 const pick = (v: unknown) => (String(v) === ALL ? undefined : String(v))
@@ -57,29 +58,29 @@ const pick = (v: unknown) => (String(v) === ALL ? undefined : String(v))
 
 <template>
   <div class="mx-auto max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
-    <h1 class="shop-display text-3xl text-highlighted sm:text-4xl">La boutique</h1>
-    <p class="mt-2 text-muted">{{ products.length }} objet{{ products.length > 1 ? 's' : '' }} disponible{{ products.length > 1 ? 's' : '' }}</p>
+    <h1 class="shop-display text-3xl text-highlighted sm:text-4xl">{{ t('productShopTitle') }}</h1>
+    <p class="mt-2 text-muted">{{ tf(one(products.length) ? 'productCountOne' : 'productCountOther', { count: products.length }) }}</p>
 
     <form class="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center" role="search" @submit.prevent>
       <UInput
         v-model="q"
         icon="i-lucide-search"
-        placeholder="Chercher un objet"
+        :placeholder="t('productSearch')"
         class="sm:max-w-xs sm:flex-1"
-        aria-label="Chercher un objet"
+        :aria-label="t('productSearch')"
       />
       <USelect
         :model-value="collectionId ?? ALL"
         :items="collectionItems"
         class="sm:w-52"
-        aria-label="Filtrer par collection"
+        :aria-label="t('productFilterCollection')"
         @update:model-value="setQuery({ collection: pick($event) })"
       />
       <USelect
         :model-value="categoryId ?? ALL"
         :items="categoryItems"
         class="sm:w-52"
-        aria-label="Filtrer par rayon"
+        :aria-label="t('productFilterCategory')"
         @update:model-value="setQuery({ category: pick($event) })"
       />
       <UButton
@@ -87,7 +88,7 @@ const pick = (v: unknown) => (String(v) === ALL ? undefined : String(v))
         color="neutral"
         variant="ghost"
         icon="i-lucide-x"
-        label="Effacer"
+        :label="t('productClearFilters')"
         @click="clearFilters()"
       />
     </form>
@@ -98,8 +99,8 @@ const pick = (v: unknown) => (String(v) === ALL ? undefined : String(v))
       :currency="currencyCode"
       :pending="pending"
       :error="error"
-      :empty-title="hasFilters ? 'Aucun objet ne correspond' : 'La boutique est vide'"
-      :empty-message="hasFilters ? 'Élargissez la recherche ou retirez un filtre.' : 'Les produits publiés apparaîtront ici.'"
+      :empty-title="t(hasFilters ? 'productNoMatchTitle' : 'productListEmptyTitle')"
+      :empty-message="t(hasFilters ? 'productNoMatchMessage' : 'productListEmptyMessage')"
       @retry="refresh()"
     />
   </div>

@@ -11,10 +11,13 @@ On first start, the PGlite database is created under `.data/`, the schema is
 pushed, then the shop is seeded: 20 published products with photos, EUR and
 USD prices and stock, 2 collections, 5 categories, 2 regions (Europe/EUR and
 United States/USD) with 20% French VAT and 8.25% US sales tax, 1 warehouse,
-2 shipping options, 1 automatic promotion and the code `BIENVENUE10`.
+2 shipping options, 1 automatic promotion and the code `WELCOME10`.
 
-The shop's copy is in French. The admin is at `/admin`, with an account
-created for you in development:
+The storefront is in English by default and in French when the browser
+prefers it (a switch sits in the header). The catalog itself is data: it is
+seeded in English, or in French with `DEMO_LOCALE=fr` (the promo code is
+then `BIENVENUE10`). The admin is at `/admin`, with an account created for
+you in development:
 
 ```
 owner@pygmalion.dev / pygmalion
@@ -25,10 +28,12 @@ The credentials are printed to the console on every start.
 ## Changing the catalog
 
 All demo content is data, in `modules/demo/runtime/catalog.ts`: products,
-options, prices, images. The seed (`modules/demo/runtime/seed.ts`) is
-**idempotent block by block**. Edit the catalog, run `pnpm dev` again, what is
-missing is created and the rest does not move. To start over, stop the server
-then `rm -rf .data`.
+options, prices, images, with the copy in both languages. The seed
+(`modules/demo/runtime/seed.ts`) is **idempotent block by block**. Edit the
+catalog, run `pnpm dev` again, what is missing is created and the rest does
+not move. To start over, stop the server then `rm -rf .data`. A store seeded
+in one language keeps it: switch `DEMO_LOCALE` and reset `.data` to reseed in
+the other.
 
 Photos live in `public/demo/` (CC0, see `public/demo/CREDITS.md`).
 

@@ -4,6 +4,7 @@ import type { StoreVariant } from '@oumarbarry/pygmalion-sdk'
 const client = usePygmalion()
 const route = useRoute()
 const { regionId, currencyCode, addItem, openDrawer } = useShop()
+const { t, tf, money } = useShopText()
 
 const id = computed(() => String(route.params.id))
 
@@ -45,7 +46,7 @@ async function add() {
 }
 
 useSeoMeta({
-  title: () => product.value?.title ?? 'Produit',
+  title: () => product.value?.title ?? t('productFallbackTitle'),
   description: () => product.value?.subtitle ?? product.value?.description ?? '',
 })
 </script>
@@ -56,12 +57,12 @@ useSeoMeta({
       :pending="pending"
       :error="isNotFound(error) ? null : error"
       :empty="!product"
-      empty-title="Produit introuvable"
-      empty-message="Il a peut-être été retiré de la boutique."
+      :empty-title="t('productNotFoundTitle')"
+      :empty-message="t('productNotFoundMessage')"
       @retry="refresh()"
     >
       <template #empty-action>
-        <UButton to="/products" class="mt-5" color="neutral" variant="outline" label="Retour à la boutique" />
+        <UButton to="/products" class="mt-5" color="neutral" variant="outline" :label="t('commonBackToShop')" />
       </template>
 
       <div v-if="product" class="grid gap-10 lg:grid-cols-2 lg:gap-14">
@@ -70,7 +71,7 @@ useSeoMeta({
         <div class="lg:pt-4">
           <NuxtLink to="/products" class="inline-flex items-center gap-1.5 text-sm text-muted hover:text-highlighted">
             <UIcon name="i-lucide-arrow-left" class="size-4" />
-            La boutique
+            {{ t('productShopTitle') }}
           </NuxtLink>
 
           <h1 class="shop-display mt-4 text-3xl text-highlighted sm:text-4xl" data-testid="product-title">
@@ -79,7 +80,7 @@ useSeoMeta({
           <p v-if="product.subtitle" class="mt-2 text-lg text-muted">{{ product.subtitle }}</p>
 
           <p class="shop-price mt-5 text-3xl text-highlighted" :data-amount="price" data-testid="product-price">
-            {{ price === null ? 'Prix indisponible' : formatMoney(price, currencyCode) }}
+            {{ price === null ? t('productNoPrice') : money(price, currencyCode) }}
           </p>
 
           <VariantPicker
@@ -105,7 +106,7 @@ useSeoMeta({
             :disabled="!canAdd"
             :loading="adding"
             :leading-icon="adding ? 'i-lucide-loader-circle' : undefined"
-            :label="canAdd ? 'Ajouter au panier' : 'Choisissez une déclinaison'"
+            :label="t(canAdd ? 'productAddToCart' : 'productChooseVariant')"
             data-testid="add-to-cart"
             @click="add()"
           />
@@ -115,16 +116,16 @@ useSeoMeta({
 
           <dl class="mt-8 space-y-2 border-t border-default pt-6 text-sm">
             <div v-if="product.material" class="flex gap-3">
-              <dt class="w-28 shrink-0 text-muted">Matière</dt>
+              <dt class="w-28 shrink-0 text-muted">{{ t('productMaterial') }}</dt>
               <dd class="text-toned">{{ product.material }}</dd>
             </div>
             <div v-if="selected?.sku" class="flex gap-3">
-              <dt class="w-28 shrink-0 text-muted">Référence</dt>
+              <dt class="w-28 shrink-0 text-muted">{{ t('productSku') }}</dt>
               <dd class="text-toned">{{ selected.sku }}</dd>
             </div>
             <div class="flex gap-3">
-              <dt class="w-28 shrink-0 text-muted">Livraison</dt>
-              <dd class="text-toned">Sous 48 h depuis Nantes · offerte dès 80&nbsp;€</dd>
+              <dt class="w-28 shrink-0 text-muted">{{ t('commonShipping') }}</dt>
+              <dd class="text-toned">{{ tf('productShippingInfo', { amount: money(8000, 'eur') }) }}</dd>
             </div>
           </dl>
         </div>

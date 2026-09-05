@@ -2,6 +2,7 @@
 import type { StoreProductListItem } from '@oumarbarry/pygmalion-sdk'
 
 const props = defineProps<{ product: StoreProductListItem; currency?: string }>()
+const { t, money } = useShopText()
 
 // The API sends cents; the card only picks the smallest one and formats it.
 const from = computed(() => priceFrom(props.product.variants))
@@ -31,10 +32,10 @@ const multiPriced = computed(() => {
     <h3 class="mt-3 font-semibold text-highlighted group-hover:underline underline-offset-4">{{ product.title }}</h3>
     <p v-if="product.subtitle" class="mt-0.5 line-clamp-1 text-sm text-muted">{{ product.subtitle }}</p>
     <p v-if="from !== null" class="shop-price mt-1.5 text-sm text-highlighted" :data-amount="from">
-      <span v-if="multiPriced" class="font-normal text-muted">à partir de </span>{{ formatMoney(from, currency) }}
+      <span v-if="multiPriced" class="font-normal text-muted">{{ t('productFrom') }}</span>{{ money(from, currency) }}
     </p>
     <!-- No price in this region is a real case (a product priced only in USD,
          say). Say it — a card whose price line is simply absent reads broken. -->
-    <p v-else class="mt-1.5 text-sm text-muted">Prix indisponible ici</p>
+    <p v-else class="mt-1.5 text-sm text-muted">{{ t('productNoPriceHere') }}</p>
   </NuxtLink>
 </template>

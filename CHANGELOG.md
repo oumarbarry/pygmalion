@@ -34,7 +34,8 @@ First public release.
   and a signed webhook.
 - Module hooks `pygmalion:schema`, `pygmalion:providers` and
   `pygmalion:customer-auth`, and the `pygmalion:event` Nitro hook.
-- `apps/playground`: the demo shop, seeded in development, and the E2E
+- `apps/playground`: the demo shop, seeded in development in English or in
+  French (`DEMO_LOCALE`), a storefront in both languages, and the E2E
   suites.
 
 [Unreleased]: https://github.com/oumarbarry/pygmalion/compare/v0.1.0...HEAD

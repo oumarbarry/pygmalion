@@ -2,7 +2,8 @@
 definePageMeta({ layout: 'account', middleware: 'customer' })
 
 const client = usePygmalion()
-useSeoMeta({ title: 'Mes commandes' })
+const { t } = useShopText()
+useSeoMeta({ title: () => t('accountOrders') })
 
 const { data, pending, error, refresh } = await useAsyncData('account:orders', () =>
   client.store.orders.list({ limit: 50 }),
@@ -12,20 +13,20 @@ const orders = computed(() => data.value?.orders ?? [])
 
 <template>
   <section>
-    <h2 class="text-lg font-bold text-highlighted">Mes commandes</h2>
+    <h2 class="text-lg font-bold text-highlighted">{{ t('accountOrders') }}</h2>
 
     <AsyncState
       class="mt-4"
       :pending="pending"
       :error="error"
       :empty="!orders.length"
-      empty-title="Aucune commande pour l'instant"
-      empty-message="Vos achats apparaîtront ici dès la première commande."
+      :empty-title="t('accountNoOrdersTitle')"
+      :empty-message="t('accountNoOrdersMessage')"
       empty-icon="i-lucide-package"
       @retry="refresh()"
     >
       <template #empty-action>
-        <UButton to="/products" class="mt-5" color="primary" label="Voir la boutique" />
+        <UButton to="/products" class="mt-5" color="primary" :label="t('commonBrowseShop')" />
       </template>
 
       <ul class="divide-y divide-default border-y border-default">
