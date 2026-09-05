@@ -2,7 +2,7 @@
 // Consumes POST /api/admin/auth-bootstrap (packages/nuxt — not touched here).
 // That endpoint has no companion "is bootstrap needed?" GET, so we attempt
 // it directly and read its 403 ("already bootstrapped") to redirect to
-// sign-in instead of guessing state up front (no speculative
+// ponytail: sign-in instead of guessing state up front (no speculative
 // pre-check; add one if/when that GET endpoint exists).
 definePageMeta({ layout: 'admin-auth' })
 

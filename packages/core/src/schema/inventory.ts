@@ -8,7 +8,7 @@ import { productVariants } from './products'
 // counter that can drift from the reservation rows it's supposed to summarize.
 
 // --- StockLocationAddress / StockLocation ------------------------------------
-// The address is managed inline through the stock-location service (no
+// ponytail: the address is managed inline through the stock-location service (no
 // standalone address CRUD). Medusa's cascade direction (delete address ->
 // delete location) doesn't fit the soft-delete convention used everywhere
 // else here, so `addressId` is nulled on delete instead (location loses its

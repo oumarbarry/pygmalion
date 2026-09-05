@@ -27,7 +27,7 @@ export async function pushDbSchema(
  * baseline is the empty snapshot, so the result is a create-from-scratch
  * script, not an incremental diff.
  *
- * Deliberately an empty baseline instead of a snapshot folder. Incremental
+ * ponytail: deliberately an empty baseline instead of a snapshot folder. Incremental
  * convergence is `pushDbSchema` (it introspects the live DB); the day a
  * reviewable migration *history* is needed, keep the snapshots drizzle-kit
  * already knows how to emit and diff those two instead.

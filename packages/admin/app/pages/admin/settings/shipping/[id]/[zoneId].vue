@@ -147,7 +147,7 @@ async function createOption() {
         priceType: draft.priceType,
       },
     })
-    // Two calls, no rollback. If the price write fails the option
+    // ponytail: two calls, no rollback. If the price write fails the option
     // exists with no price: `listOptionsForCart` then just hides it (no price
     // resolved => invisible, not an error) and the toast tells the merchant.
     if (minor !== null) {

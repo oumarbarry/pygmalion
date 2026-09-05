@@ -24,7 +24,7 @@ import type { ServiceContext } from './context'
  * fulfillment re-increments stock and recreates the reservation. Order-level
  * `fulfillment_status` is DERIVED via `deriveFulfillmentStatus`.
  *
- * Deliberately assumes a 1:1 variant↔inventory-item link (the auto-created one,
+ * ponytail: deliberately assumes a 1:1 variant↔inventory-item link (the auto-created one,
  * requiredQuantity=1): kit fulfillment (one line spanning several inventory
  * items) records a single fulfillment_item against the first reserved item.
  * Upgrade path: one fulfillment_item per (line, inventory item) if kits ship.

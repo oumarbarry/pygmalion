@@ -40,7 +40,7 @@ export interface OrderEditsServiceContext extends ServiceContext {
  * locks the order row `for update`, then re-reads lines + the fulfilled-units
  * guard INSIDE the tx — so a concurrent double-confirm applies the deltas once.
  *
- * Deliberate simplification: added-line taxes use the tax service (real rates); a quantity
+ * ponytail: deliberate simplification: added-line taxes use the tax service (real rates); a quantity
  * UPDATE scales the line's existing tax/discount proportionally (linear under a
  * flat rate); promotions are NOT re-run (that needs the cart engine). Upgrade
  * path: re-run the promo service here if edit-time discount accuracy matters.

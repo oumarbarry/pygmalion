@@ -10,7 +10,7 @@ import type { OrderClaim, OrderDetail, OrderExchange, OrderReturn } from '../uti
  * models exactly one URL. `$adminFetch` is the very instance it wraps, so the
  * same contract still holds: 401 → sign-in, any other error → one toast.
  *
- * N+1 on return lines. N is the number of returns of a single order
+ * ponytail: N+1 on return lines. N is the number of returns of a single order
  * (0-3 in practice). Upgrade path: items embedded in `GET /admin/returns`.
  */
 export function useOrderDetail(orderId: string) {

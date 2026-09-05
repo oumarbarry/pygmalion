@@ -1,7 +1,7 @@
 /**
  * "Aujourd'hui" dashboard data.
  *
- * `toShip`/`toRefund` still return empty lists on purpose: no mock
+ * ponytail: `toShip`/`toRefund` still return empty lists on purpose: no mock
  * data, no backend call. Upgrade path once the orders screens wire them up:
  * replace the two `ref([])` below with `useAdminFetch('/api/admin/orders',
  * { query: { status: ... } })` calls (expected shape: `{ orders: [...] }`),

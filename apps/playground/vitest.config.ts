@@ -12,7 +12,7 @@ export default defineConfig({
     // once and starves them past the hook timeout (`ENOTEMPTY` on `.nuxt/test/*`
     // temp dirs, `Hook timed out`). Same fix already applied to the root
     // `vitest.config.ts` for the (lighter) PGlite-per-file core suite:
-    // serial files here too, for the same reason.
+    // ponytail: serial files here too, for the same reason.
     fileParallelism: false,
     // @nuxt/test-utils runs the built server with NODE_ENV=production, which
     // (correctly) trips the "secret required in production" guard — inject a

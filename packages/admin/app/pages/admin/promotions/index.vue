@@ -3,7 +3,7 @@
  * The promotions list: what the discount is, what it lands on, whether
  * it runs, and how much of its budget is gone.
  *
- * `GET /api/admin/promotions` returns raw rows (no application
+ * ponytail: `GET /api/admin/promotions` returns raw rows (no application
  * method, no rules, no status filter, no `count`), so the page loads one
  * page and enriches each row with its detail (N ≤ PAGE, in parallel), then
  * filters client-side. Exactly the orders-list trade-off, same upgrade path.

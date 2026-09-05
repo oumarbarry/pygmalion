@@ -4,7 +4,7 @@
  * → where it lands → summary showing the difference BOTH ways (the customer
  * still owes, or you owe a refund).
  *
- * Deliberately, replacement lines are picked from the order's own lines (the
+ * ponytail: deliberately, replacement lines are picked from the order's own lines (the
  * common exchange: same article, another size — price and variant prefilled)
  * or typed free-hand. No catalogue browser here: `POST /admin/exchanges`
  * requires an explicit `unitPrice` and no admin endpoint returns a variant's

@@ -11,7 +11,7 @@ import {
 import type { ServiceContext } from './context'
 import type { PygmalionDatabase } from '../db/types'
 
-// A real-world starter set (not the full ~250-row ISO 3166 list).
+// ponytail: A real-world starter set (not the full ~250-row ISO 3166 list).
 // Extend when a store needs to assign a region to a country not listed here.
 export const COUNTRY_SEED: readonly RegionCountry[] = [
   { iso2: 'US', iso3: 'USA', numCode: '840', name: 'united states', displayName: 'United States', regionId: null, metadata: null },

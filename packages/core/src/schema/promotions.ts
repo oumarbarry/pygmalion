@@ -8,7 +8,7 @@
 // one join instead of three (single relational schema, no per-scope
 // pivot ceremony). `attribute` stays free text (not a DB enum) — the engine
 // owns the closed set of attributes it knows how to resolve
-// (`promotions-engine.ts`'s `resolve*Attribute`). Add a DB enum if a module
+// ponytail: (`promotions-engine.ts`'s `resolve*Attribute`). Add a DB enum if a module
 // ever needs to extend the attribute set at runtime.
 import { sql } from 'drizzle-orm'
 import { boolean, check, index, integer, jsonb, pgEnum, pgTable, text, timestamp, uniqueIndex } from 'drizzle-orm/pg-core'
@@ -132,7 +132,7 @@ export const promotionApplicationMethods = pgTable(
     target: applicationMethodTarget('target').notNull(),
     allocation: applicationMethodAllocation('allocation').notNull().default('each'),
     valueType: applicationMethodValueType('value_type').notNull(),
-    // fixed: cents. percentage: whole points 0-100 (no fractional percentages;
+    // ponytail: fixed: cents. percentage: whole points 0-100 (no fractional percentages;
     // add a basis-points column if a merchant needs one).
     value: integer('value').notNull(),
     currencyCode: text('currency_code').references(() => currencies.code),

@@ -18,9 +18,9 @@ export default defineConfig({
     include: ['packages/**/src/**/*.test.ts', 'packages/**/app/**/*.test.ts', 'apps/playground/app/**/*.test.ts'],
     // Each beforeEach boots a PGlite (WASM) + full schema push (~2s). Unbounded
     // file parallelism starves the hooks past their timeout as the schema grows.
-    // Cap workers and use a generous hookTimeout; upgrade path: one PGlite
+    // ponytail: cap workers and use a generous hookTimeout; upgrade path: one PGlite
     // per file (beforeAll) + TRUNCATE between tests when the suite slows.
-    // Serial files: PGlite WASM instantiation is CPU-heavy and several suites
+    // ponytail: serial files: PGlite WASM instantiation is CPU-heavy and several suites
     // may run concurrently on the same machine.
     fileParallelism: false,
     hookTimeout: 30_000,

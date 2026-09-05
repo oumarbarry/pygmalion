@@ -188,7 +188,7 @@ function resolveShippingAttribute(attribute: string, sm: ShippingAttributeContex
 
 // --- Stacking order ---
 // BuyGet before standard; within a type, value desc; tie-break by id (stable,
-// deterministic). Deliberately skips a finer buyget tie-break on
+// ponytail: deterministic). Deliberately skips a finer buyget tie-break on
 // buy_rules_min_quantity/apply_to_quantity; add it if two BuyGet promos with
 // the exact same `value` ever need a finer stable order.
 
@@ -259,7 +259,7 @@ function computeStandardAmounts(app: ApplicationMethodEngineInput, targets: Targ
 
   // 'each': independent per line. fixed = per-unit amount (capped by
   // maxQuantity units); percentage = of the line's own remaining subtotal
-  // (percentage deliberately ignores maxQuantity; proration across a partial
+  // ponytail: (percentage deliberately ignores maxQuantity; proration across a partial
   // quantity is BuyGet/`once`'s job, add if a real "percentage off first N
   // units" promo shows up).
   for (const t of targets) {
@@ -293,7 +293,7 @@ function expandUnits(targets: TargetLine[]): Array<{ id: string; unitPrice: numb
 // capped defensively anyway). Each cycle offers `applyToQuantity` units,
 // discounted on the CHEAPEST eligible target units first (deterministic
 // "buy 2 get the cheapest one free" reading).
-// Deliberately, buy-eligible and target-eligible pools aren't mutually
+// ponytail: deliberately, buy-eligible and target-eligible pools aren't mutually
 // exclusive reservations: a unit can count toward both the "buy" trigger and
 // be the "get" target in the same pass. Correct for disjoint buy/target rule sets
 // (the common case, and what's tested); add reservation bookkeeping if a

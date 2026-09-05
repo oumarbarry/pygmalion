@@ -77,7 +77,7 @@ export const geoZones = pgTable(
     countryCode: text('country_code').notNull(),
     provinceCode: text('province_code'),
     city: text('city'),
-    // Simple postal rule: `{ codes: [...] }` exact list OR `{ prefix: '75' }`
+    // ponytail: simple postal rule: `{ codes: [...] }` exact list OR `{ prefix: '75' }`
     // prefix match, no full expression/regex grammar. Extend the shape here
     // if a real carrier integration ever needs range matching.
     postalExpression: jsonb('postal_expression').$type<{ codes?: string[]; prefix?: string } | null>(),

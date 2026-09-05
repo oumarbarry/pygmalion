@@ -203,7 +203,7 @@ export default defineNitroPlugin(async (nitroApp) => {
   // shape as the default sales channel above.
   await shipping.profiles.ensureDefault()
 
-  // Dev drain loop. Deliberately setInterval: cron's finest granularity is
+  // ponytail: dev drain loop. Deliberately setInterval: cron's finest granularity is
   // 1 min but dev wants ~5s. Swap for a scheduled Nitro task in prod.
   const timer = setInterval(() => {
     ctx.events.drain().catch((err) => console.error('[pygmalion] outbox drain failed', err))

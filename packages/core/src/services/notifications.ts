@@ -43,7 +43,7 @@ export interface NotificationProvider {
 }
 
 /**
- * Default provider. Deliberately no transport at all: the `notifications` row IS
+ * ponytail: default provider. Deliberately no transport at all: the `notifications` row IS
  * the delivery (admin feed / dev inspection). A real email or SMS module
  * registers its own provider under a different id (see the JSDoc above).
  */

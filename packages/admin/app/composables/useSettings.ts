@@ -40,7 +40,7 @@ export interface AdminRegionDetail {
 }
 
 /**
- * Mirrors `COUNTRY_SEED` (packages/core/src/services/regions.ts):
+ * ponytail: mirrors `COUNTRY_SEED` (packages/core/src/services/regions.ts):
  * no route exposes `region_country`, so the picker can't be fetched. Delete
  * this constant the day a `GET /admin/countries` exists.
  */

@@ -54,7 +54,7 @@ export function createAuthInstance<Options extends AuthInstanceConfig>(db: Pygma
   }
   return betterAuth({
     database: drizzleAdapter(db, { provider: 'pg', schema }),
-    // Dev-only fallback secret, never used when NODE_ENV=production (guarded above).
+    // ponytail: dev-only fallback secret, never used when NODE_ENV=production (guarded above).
     secret: secret ?? 'pygmalion-dev-only-insecure-secret-do-not-use-in-prod',
     ...options,
   })

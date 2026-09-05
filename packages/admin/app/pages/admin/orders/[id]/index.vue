@@ -5,7 +5,7 @@
  * rendered at all, and the two refusals a merchant can act on (cancel with
  * live shipments / with captured funds) are spelled out in plain language.
  *
- * The activity feed is derived from what the API exposes
+ * ponytail: the activity feed is derived from what the API exposes
  * (ledger + shipments + RMA rows): `order_events`, which carries the
  * before/after amounts, has no read endpoint. Upgrade path: GET /admin/orders/:id/events,
  * then `history` reads it instead of re-deriving.

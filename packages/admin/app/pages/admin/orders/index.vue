@@ -3,7 +3,7 @@
  * The orders list, organised by ACTION and not by technical status
  *: « À expédier », « À encaisser », « Retours en cours », « Toutes ».
  *
- * `GET /api/admin/orders` returns raw rows (no derived
+ * ponytail: `GET /api/admin/orders` returns raw rows (no derived
  * payment/fulfillment status, no `q`, no status filter), so the page loads a
  * page of orders and enriches each one with its detail (which does derive
  * both statuses). N ≤ `PAGE` per load, in parallel, cached. Upgrade path:

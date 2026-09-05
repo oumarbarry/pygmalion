@@ -17,7 +17,7 @@ const acceptInviteInput = z.object({
 // this is the only path to a new staff row. The invite is claimed with a
 // single conditional UPDATE (guards concurrent double-accept) before the
 // better-auth user is created, so two racing requests can't both succeed.
-// Deliberately, if createUser then fails, the invite stays burned rather than
+// ponytail: deliberately, if createUser then fails, the invite stays burned rather than
 // un-claimed; acceptable (retry = new invite), full 2-phase rollback isn't
 // worth it for an admin-only, low-volume flow.
 export default defineEventHandler(async (event) => {

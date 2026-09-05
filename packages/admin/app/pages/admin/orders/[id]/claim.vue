@@ -4,7 +4,7 @@
  * (send again / refund) → which items and what went wrong → photos →
  * replacement lines or refund amount → summary.
  *
- * Deliberately no inbound-return leg here (the API allows one). A claim is
+ * ponytail: deliberately no inbound-return leg here (the API allows one). A claim is
  * "something went wrong", not "send it back"; a merchant who wants the goods
  * back records a return from the order. Add the leg when a real flow needs
  * both in one shot.

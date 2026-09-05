@@ -202,7 +202,7 @@ export function createCheckoutService(ctx: CheckoutServiceContext) {
 
     // Default stock location for reservations (single-warehouse MVP). No
     // location configured -> the store isn't tracking inventory, skip reserving.
-    // Deliberately the first location; add multi-location routing when needed.
+    // ponytail: deliberately the first location; add multi-location routing when needed.
     const [location] = await db.select().from(stockLocations).where(isNull(stockLocations.deletedAt)).limit(1)
 
     // --- TX1: freeze cart (atomic guard), reserve, create order `pending` ----
@@ -365,7 +365,7 @@ export function createCheckoutService(ctx: CheckoutServiceContext) {
         })
         await emitDomainEvent(tx, 'order.placed', { orderId: order.id })
       })
-      // Automatic capture at placement is deliberately omitted: capture is an
+      // ponytail: automatic capture at placement is deliberately omitted: capture is an
       // explicit admin action (recommended manual-capture-at-shipment mode).
       // Add a capture here (AFTER this commit, never inside it) if a provider
       // is configured capture_method=automatic.
@@ -580,7 +580,7 @@ export function createCheckoutService(ctx: CheckoutServiceContext) {
 
   /**
    * Archive / un-archive an order (reversible). Refuses a canceled order.
-   * Un-archive returns to 'pending' (the only post-placement lifecycle state
+   * ponytail: un-archive returns to 'pending' (the only post-placement lifecycle state
    * Pygmalion produces); stash the prior status in metadata if richer
    * restoration is ever needed.
    */

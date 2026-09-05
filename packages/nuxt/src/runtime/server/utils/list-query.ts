@@ -9,7 +9,7 @@ import { getQuery, type H3Event } from 'h3'
  * `order` is passed through as the raw string (`-created_at`); each service
  * decides which columns it accepts — an unknown one must never reach SQL.
  *
- * Deliberately no `count` here. Only `GET /admin/tax-regions` returns one today;
+ * ponytail: deliberately no `count` here. Only `GET /admin/tax-regions` returns one today;
  * making it uniform means an extra SQL aggregate in ~20 services with no
  * consumer yet.
  */

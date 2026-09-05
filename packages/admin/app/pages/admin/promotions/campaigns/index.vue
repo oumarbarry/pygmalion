@@ -4,7 +4,7 @@
  * Creation asks for the name only (one question to get started); the
  * budget, the dates and the promotions are set on the campaign's own page.
  *
- * `GET /api/admin/campaigns` returns raw rows without their
+ * ponytail: `GET /api/admin/campaigns` returns raw rows without their
  * budget, so the page enriches each one with its detail, same trade-off as
  * the promotions list.
  */

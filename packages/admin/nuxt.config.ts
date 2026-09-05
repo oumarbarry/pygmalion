@@ -4,7 +4,7 @@
 // once merged — no change to @oumarbarry/pygmalion (server module) required.
 import { createResolver } from '@nuxt/kit'
 
-// A `~/`-prefixed css path resolves against the EXTENDING app's
+// ponytail: A `~/`-prefixed css path resolves against the EXTENDING app's
 // srcDir, not this layer's (a documented Nuxt layers gotcha). Resolve to an
 // absolute path instead so it works regardless of what extends this layer.
 const { resolve } = createResolver(import.meta.url)

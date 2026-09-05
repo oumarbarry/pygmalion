@@ -14,7 +14,7 @@ const REGION_COOKIE = 'pygmalion_region'
  * + a cookie) means SSR renders the same prices the browser will, and a reload
  * or a second tab lands on the same currency.
  *
- * Deliberately, a cart already opened in one region keeps ITS currency until it
+ * ponytail: deliberately, a cart already opened in one region keeps ITS currency until it
  * is completed: the cart API has no region change (`UpdateCartInput` is email +
  * addresses). Displaying `cart.currencyCode` everywhere in the cart/checkout
  * keeps that honest. Upgrade path when it matters: a `regionId` on

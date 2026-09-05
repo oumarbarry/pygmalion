@@ -30,7 +30,7 @@ export const customerUser = pgTable('customer_user', {
   // The unique index below — ported as-is from Medusa's `(email,
   // has_account)` — lets a guest and a registered account coexist for the
   // same email as two distinct rows.
-  // Deliberately not ported: Medusa's guest-upgrade-in-place (reuse the guest
+  // ponytail: deliberately not ported: Medusa's guest-upgrade-in-place (reuse the guest
   // row when that email later registers). better-auth itself refuses to sign
   // up an email that already has ANY row here (its own duplicate-email guard,
   // not scoped by has_account), so a guest row must be created for an email

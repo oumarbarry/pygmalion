@@ -2,7 +2,7 @@ import { asc, eq, ilike, or } from 'drizzle-orm'
 import { currencies, type Currency } from '../schema/settings'
 import type { ServiceContext } from './context'
 
-// Seeded with the common ~40 trading currencies, not the full ~150-row ISO
+// ponytail: seeded with the common ~40 trading currencies, not the full ~150-row ISO
 // 4217 table. Real data (name/symbol/decimal_digits), just not
 // exhaustive. Extend this list (or load a fuller ISO 4217 source) if a store
 // needs a currency that isn't here.

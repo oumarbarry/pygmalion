@@ -45,7 +45,7 @@ export function useCart() {
    * The cart, created on first need, never before (an empty cart per visitor
    * is a row nobody asked for).
    *
-   * Deliberately client-side creation. `Set-Cookie` from an SSR-internal call
+   * ponytail: deliberately client-side creation. `Set-Cookie` from an SSR-internal call
    * never reaches the browser, so the cart token would be lost; every caller
    * here is a user interaction (add to cart), which runs in the browser.
    */

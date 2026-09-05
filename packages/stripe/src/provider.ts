@@ -9,7 +9,7 @@ import type {
 
 // Stripe PaymentIntents provider. Amounts are
 // Stripe's smallest currency unit = our integer cents, passed through
-// natively. Zero-decimal currencies (JPY, KRW) also use the base
+// ponytail: natively. Zero-decimal currencies (JPY, KRW) also use the base
 // unit in Stripe, and our "cents" model already stores minor units, so the
 // pass-through is correct for them too — no per-currency exponent table until
 // a real multi-currency store needs one.

@@ -28,7 +28,7 @@ import type { ServiceContext } from './context'
 /** 3 attempts total: immediate, +retryBaseMs, +retryBaseMs*5 (5s, 25s). */
 const MAX_ATTEMPTS = 3
 const DEFAULT_RETRY_BASE_MS = 5_000
-// Fixed short timeout: a subscriber that needs more than 10s should answer 202
+// ponytail: fixed short timeout: a subscriber that needs more than 10s should answer 202
 // and work async. Make it per-endpoint when someone actually asks.
 const REQUEST_TIMEOUT_MS = 10_000
 
@@ -81,7 +81,7 @@ export async function enqueueWebhookDeliveries(
     .from(webhookEndpoints)
     .where(and(eq(webhookEndpoints.active, true), isNull(webhookEndpoints.deletedAt)))
 
-  // Subscription match in JS: endpoints are a handful of rows and a
+  // ponytail: subscription match in JS: endpoints are a handful of rows and a
   // jsonb containment predicate buys nothing. Push it into SQL if the table
   // ever grows past a few hundred rows.
   const targets = endpoints.filter((e) => e.events.includes('*') || e.events.includes(event))

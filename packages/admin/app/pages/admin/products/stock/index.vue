@@ -11,7 +11,7 @@
  * an audit trail.
  *
  * Levels are fetched per item (no bulk endpoint), capped at the first page of
- * items. N+1 over <=50 rows; upgrade path = a levels-included list
+ * ponytail: items. N+1 over <=50 rows; upgrade path = a levels-included list
  * endpoint if a merchant ever has thousands of références.
  */
 definePageMeta({ layout: 'admin' })
